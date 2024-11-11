@@ -1,0 +1,3 @@
+[tool.dagster]
+module_name = "pipeline.definitions"
+code_location_name = "travel-score"

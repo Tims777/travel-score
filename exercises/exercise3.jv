@@ -1,0 +1,121 @@
+pipeline CountryStatsPipeline {
+
+    Extractor
+        ->FileInterpreter
+        ->SheetPicker
+        ->RangeSelector
+        ->HeaderFixer;
+
+    HeaderFixer
+        ->BondIssuanceInterpreter
+        ->BondIssuanceLoader;
+
+    HeaderFixer
+        ->GDPPerCapitaInterpreter
+        ->GDPPerCapitaLoader;
+
+    block Extractor oftype HttpExtractor {
+        url: "https://thedocs.worldbank.org/en/doc/7d852628d96b9411d43e5d36d5dff941-0050062022/original/Graphs-Chapter-5-02082022.xlsx";
+    }
+
+    block FileInterpreter oftype XLSXInterpreter { }
+
+    block SheetPicker oftype SheetPicker {
+        sheetName: "Figure S5.1.2";
+    }
+
+    block RangeSelector oftype CellRangeSelector {
+        select: range P2:S45;
+    }
+
+    block HeaderFixer oftype HeaderFixer { }
+
+    block BondIssuanceInterpreter oftype TableInterpreter {
+        header: true;
+        columns: [
+            "Country Code" oftype CountryCodeAlpha3,
+            "Bond Issuance Share" oftype Fraction,
+        ];
+    }
+
+    block BondIssuanceLoader oftype SQLiteLoader {
+        table: "bondIssuance";
+        file: "country-stats.sqlite";
+    }
+
+    block GDPPerCapitaInterpreter oftype TableInterpreter {
+        header: true;
+        columns: [
+            "Country Code" oftype CountryCodeAlpha3,
+            "GDP per Capita" oftype PositiveDecimal,
+        ];
+    }
+
+    block GDPPerCapitaLoader oftype SQLiteLoader {
+        table: "gdpPerCapita";
+        file: "country-stats.sqlite";
+    }
+}
+
+valuetype PositiveDecimal oftype decimal {
+    constraints: [
+        Positive
+    ];
+}
+
+valuetype Fraction oftype decimal {
+    constraints: [
+        Positive,
+        LessThanOne
+    ];
+}
+
+constraint Positive oftype RangeConstraint {
+    lowerBound: 0;
+    lowerBoundInclusive: true;
+}
+
+constraint LessThanOne oftype RangeConstraint {
+    upperBound: 1;
+    upperBoundInclusive: true;
+}
+
+composite blocktype HeaderFixer {
+    input inputName oftype Sheet;
+    output outputName oftype Sheet;
+
+    inputName
+        ->Col1Writer
+        ->Col2Writer
+        ->Col3Writer
+        ->Col4Writer
+        ->outputName;
+
+    block Col1Writer oftype CellWriter {
+        at: cell A1;
+        write: [
+            "Country Code"
+        ];
+    }
+
+    block Col2Writer oftype CellWriter {
+        at: cell B1;
+        write: [
+            "Economy"
+        ];
+    }
+
+    block Col3Writer oftype CellWriter {
+        at: cell C1;
+        write: [
+            "GDP per Capita"
+        ];
+    }
+
+    block Col4Writer oftype CellWriter {
+        at: cell D1;
+        write: [
+            "Bond Issuance Share"
+        ];
+    }
+}

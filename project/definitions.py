@@ -1,11 +1,11 @@
 from pathlib import Path
 from dagster import Definitions, load_assets_from_modules
 
-from .assets import inform, icp, score
+from .assets import combined, countries, icp, inform, maps
 from .resources.io_manager import LocalFileSystemIOManager
 
-all_assets = load_assets_from_modules([inform, icp, score])
-data_dir = Path(__file__).parents[2].joinpath("data")
+all_assets = load_assets_from_modules([countries, icp, inform, combined, maps])
+data_dir = Path(__file__).parents[1].joinpath("data")
 
 defs = Definitions(
     assets=all_assets,

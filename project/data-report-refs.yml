@@ -33,7 +33,27 @@ natural-earth-license:
   title: Natural Earth - Terms of Use
   url: https://www.naturalearthdata.com/about/terms-of-use/
 
+python:
+  type: web
+  title: Python
+  url: https://www.python.org/
+
 dagster:
   type: web
   title: Dagster
   url: https://dagster.io/
+
+pandas:
+  type: web
+  title: Pandas
+  url: https://pandas.pydata.org/
+
+geopandas:
+  type: web
+  title: GeoPandas
+  url: https://geopandas.org/
+
+sqlite:
+  type: web
+  title: SQLite
+  url: https://www.sqlite.org/

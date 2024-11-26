@@ -1,0 +1,39 @@
+made:
+  type: web
+  title: Methods of Advanced Data Engineering
+  url: https://oss.cs.fau.de/teaching/specific/made/
+
+inform-risk:
+  type: web
+  title: INFORM Risk
+  url: https://drmkc.jrc.ec.europa.eu/inform-index/INFORM-Risk
+
+inform-risk-license:
+  type: web
+  title: INFORM Risk - Copyright
+  url: https://commission.europa.eu/legal-notice_en
+
+icp:
+  type: web
+  title: International Comparison Program
+  url: https://www.worldbank.org/en/programs/icp
+
+icp-license:
+  type: web
+  title: International Comparison Program - Details
+  url: https://datacatalog.worldbank.org/search/dataset/0066092/International-Comparison-Program-2021
+
+natural-earth:
+  type: web
+  title: Natural Earth
+  url: https://www.naturalearthdata.com/
+
+natural-earth-license:
+  type: web
+  title: Natural Earth - Terms of Use
+  url: https://www.naturalearthdata.com/about/terms-of-use/
+
+dagster:
+  type: web
+  title: Dagster
+  url: https://dagster.io/

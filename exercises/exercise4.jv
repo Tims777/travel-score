@@ -7,7 +7,8 @@ pipeline CountryStatsPipeline {
         ->HeaderWriterPt1
         ->HeaderWriterPt2
         ->TableInterpreter
-        ->CelsiusToFahrenheitTransformer
+        ->CelsiusToFahrenheitTransformerPt1
+        ->CelsiusToFahrenheitTransformerPt2
         ->Loader;
 
     block Extractor oftype HttpExtractor {
@@ -63,11 +64,19 @@ pipeline CountryStatsPipeline {
         Fahrenheit: (Celsius * 9/5) + 32;
     }
 
-    block CelsiusToFahrenheitTransformer oftype TableTransformer {
+    block CelsiusToFahrenheitTransformerPt1 oftype TableTransformer {
         inputColumns: [
             'temperature'
         ];
         outputColumn: 'temperature';
+        uses: CelsiusToFahrenheit;
+    }
+
+    block CelsiusToFahrenheitTransformerPt2 oftype TableTransformer {
+        inputColumns: [
+            'battery_temperature'
+        ];
+        outputColumn: 'battery_temperature';
         uses: CelsiusToFahrenheit;
     }
 

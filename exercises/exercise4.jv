@@ -1,0 +1,102 @@
+pipeline CountryStatsPipeline {
+
+    Extractor
+        ->ArchiveInterpreter
+        ->FilePicker
+        ->FileInterpreter
+        ->HeaderWriterPt1
+        ->HeaderWriterPt2
+        ->TableInterpreter
+        ->CelsiusToFahrenheitTransformer
+        ->Loader;
+
+    block Extractor oftype HttpExtractor {
+        url: "https://www.mowesta.com/data/measure/mowesta-dataset-20221107.zip";
+    }
+
+    block ArchiveInterpreter oftype ArchiveInterpreter {
+        archiveType: "zip";
+    }
+
+    block FilePicker oftype FilePicker {
+        path: "./data.csv";
+    }
+
+    block FileInterpreter oftype CSVFileInterpreter {
+        delimiter: ";";
+    }
+
+    block HeaderWriterPt1 oftype CellWriter {
+        at: range A1:E1;
+        write: [
+            "id",
+            "producer",
+            "model",
+            "month",
+            "temperature"
+        ];
+    }
+
+    block HeaderWriterPt2 oftype CellWriter {
+        at: range J1:J1;
+        write: [
+            "battery_temperature"
+        ];
+    }
+
+    block TableInterpreter oftype TableInterpreter {
+        header: true;
+        columns: [
+            "id" oftype PositiveInteger,
+            "producer" oftype text,
+            "model" oftype text,
+            "month" oftype Month,
+            "temperature" oftype decimal,
+            "battery_temperature" oftype decimal,
+        ];
+    }
+
+    transform CelsiusToFahrenheit {
+        from Celsius oftype decimal;
+        to Fahrenheit oftype decimal;
+
+        Fahrenheit: (Celsius * 9/5) + 32;
+    }
+
+    block CelsiusToFahrenheitTransformer oftype TableTransformer {
+        inputColumns: [
+            'temperature'
+        ];
+        outputColumn: 'temperature';
+        uses: CelsiusToFahrenheit;
+    }
+
+    block Loader oftype SQLiteLoader {
+        table: "temperatures";
+        file: "temperatures.sqlite";
+    }
+}
+
+valuetype PositiveInteger oftype integer {
+    constraints: [
+        Positive
+    ];
+}
+
+constraint Positive oftype RangeConstraint {
+    lowerBound: 0;
+    lowerBoundInclusive: true;
+}
+
+valuetype Month oftype integer {
+    constraints: [
+        MonthConstraint
+    ];
+}
+
+constraint MonthConstraint oftype RangeConstraint {
+    lowerBound: 1;
+    lowerBoundInclusive: true;
+    upperBound: 12;
+    upperBoundInclusive: true;
+}

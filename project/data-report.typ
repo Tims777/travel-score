@@ -88,7 +88,7 @@ There are no automatic meta quality measures in place yet. However, it is easily
 
 = Result and Limitations
 
-The main output of my current data pipeline is the combined dataset described in @structure. The output dataset inherits its nature from its ancestor datasets and is therefore of high quality regarding accuracy and completeness. The timeliness suffers a little, due to the ICP data being from the year 2021, while the consistency suffers as the INFORM data is taken from the most recent 2024 report. Regarding its relevancy, the dataset has yet to proove itself during the final report.
+The main output of my current data pipeline is the combined dataset described in @structure. The output dataset inherits its nature from its ancestor datasets and is therefore of high quality regarding accuracy and completeness. The timeliness suffers a little, due to the ICP data being from the year 2021, while the consistency suffers as the INFORM data is taken from the most recent 2024 report. Regarding its relevancy, the dataset has yet to prove itself during the final report.
 
 #figure(
   grid(

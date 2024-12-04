@@ -86,15 +86,17 @@ benchmark my own indicators against the TTDI ones.
    [#1](https://github.com/Tims777/travel-score/issues/1)
 2. Extraction of INFORM and ICP datasets
    [#2](https://github.com/Tims777/travel-score/issues/2)
-3. Statistical analysis of extracted data
-   [#3](https://github.com/Tims777/travel-score/issues/3)
-4. Produce first iteration of output data
+3. Produce first iteration of output data
    [#4](https://github.com/Tims777/travel-score/issues/4)
+4. Statistical analysis of extracted data
+   [#3](https://github.com/Tims777/travel-score/issues/3)
 5. Investigation of sensible OSM elements
    [#5](https://github.com/Tims777/travel-score/issues/5)
-6. Extraction and integration of OSM data
+6. Basic testing (system- and unit-tests)
+   [#5](https://github.com/Tims777/travel-score/issues/9)
+7. Extraction and integration of OSM data
    [#6](https://github.com/Tims777/travel-score/issues/6)
-7. Advanced data analysis and visualizations
+8. Advanced data analysis and visualizations
    [#7](https://github.com/Tims777/travel-score/issues/7)
-8. Result validation by comparison with TTDI
+9. Result validation by comparison with TTDI
    [#8](https://github.com/Tims777/travel-score/issues/8)

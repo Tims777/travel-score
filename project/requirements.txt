@@ -2,4 +2,5 @@ dagster
 pandas
 geopandas
 matplotlib
+seaborn
 pytest

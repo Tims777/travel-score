@@ -1,7 +1,7 @@
 from os import environ
 from pathlib import Path
 from sqlite3 import connect
-from subprocess import CompletedProcess, run
+from subprocess import run
 from sys import executable as python
 from tempfile import TemporaryDirectory
 

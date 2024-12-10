@@ -1,12 +1,19 @@
 from io import BytesIO
 import re
+from urllib.parse import urlencode
 from zipfile import ZipFile
 from dagster import asset
 from pandas import DataFrame, read_csv
 from urllib.request import urlopen
 
 
-DOWNLOAD_URL = "https://databank.worldbank.org/AjaxDownload/FileDownloadHandler.ashx?filename=P_8d54d70d-f0de-4d4e-85f5-9b3443b15ad9.zip&filetype=CSV&language=en&displayfile=P_Data_Extract_From_ICP_2021.zip"
+DOWNLOAD_URL = "https://databank.worldbank.org/AjaxDownload/FileDownloadHandler.ashx"
+DOWNLOAD_ARGS = {
+    "filename": "P_8d54d70d-f0de-4d4e-85f5-9b3443b15ad9.zip",
+    "filetype": "CSV",
+    "language": "en",
+    "displayfile": "P_Data_Extract_From_ICP_2021.zip",
+}
 
 
 def extract_csv_from_zip(zip: ZipFile, pattern: str):
@@ -17,7 +24,7 @@ def extract_csv_from_zip(zip: ZipFile, pattern: str):
 
 @asset(group_name="datasets")
 def icp_metrics() -> DataFrame:
-    zip_url = DOWNLOAD_URL
+    zip_url = DOWNLOAD_URL + "?" + urlencode(DOWNLOAD_ARGS)
 
     with urlopen(zip_url) as resp:
         data = resp.read()

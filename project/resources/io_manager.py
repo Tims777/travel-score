@@ -2,7 +2,6 @@ from pathlib import Path
 from sqlite3 import connect
 from dagster import AssetKey, ConfigurableIOManager, MetadataValue
 from matplotlib.figure import Figure
-from seaborn.axisgrid import Grid
 from pandas import DataFrame, read_sql
 from geopandas import GeoDataFrame, read_file
 
@@ -23,7 +22,7 @@ class LocalFileSystemIOManager(ConfigurableIOManager):
     def _get_table_name(self, asset_key: AssetKey) -> str:
         return "_".join(asset_key.path)
 
-    def handle_output(self, context, obj: None | DataFrame | GeoDataFrame | Figure | Grid):
+    def handle_output(self, context, obj: None | DataFrame | GeoDataFrame | Figure):
         table = self._get_table_name(context.asset_key)
         path = self._get_fs_path(context.asset_key)
         meta = {}
@@ -39,7 +38,7 @@ class LocalFileSystemIOManager(ConfigurableIOManager):
                 obj.to_sql(table, con, if_exists="replace")
             meta["num_records"] = len(obj)
             meta["preview"] = MetadataValue.md(obj.head().to_markdown())
-        elif isinstance(obj, Figure | Grid):
+        elif isinstance(obj, Figure):
             outfile = path.with_suffix(FIG_SUFFIX)
             obj.savefig(outfile)
         else:

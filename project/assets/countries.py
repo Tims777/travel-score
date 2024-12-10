@@ -8,12 +8,12 @@ AMERICA = ["North America", "South America"]
 EXCLUDE = ["Greenland"]
 
 
-@asset
+@asset(group_name="datasets")
 def world() -> GeoDataFrame:
     return read_file(DOWNLOAD_URL)
 
 
-@asset
+@asset(group_name="datasets")
 def americas(world: GeoDataFrame) -> GeoDataFrame:
     americas = world[world["continent"].isin(AMERICA) & ~world["name"].isin(EXCLUDE)]
     return GeoDataFrame(americas)

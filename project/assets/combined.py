@@ -3,7 +3,7 @@ from pandas import DataFrame
 from geopandas import GeoDataFrame
 
 
-@asset
+@asset(group_name="datasets")
 def combined_dataset(
     americas: GeoDataFrame, inform_scores: DataFrame, icp_metrics_2021: DataFrame
 ) -> GeoDataFrame:

@@ -15,7 +15,7 @@ def extract_csv_from_zip(zip: ZipFile, pattern: str):
         return read_csv(csv_file)
 
 
-@asset
+@asset(group_name="datasets")
 def icp_metrics() -> DataFrame:
     zip_url = DOWNLOAD_URL
 
@@ -31,7 +31,7 @@ def icp_metrics() -> DataFrame:
     return df
 
 
-@asset
+@asset(group_name="datasets")
 def icp_metrics_2021(icp_metrics: DataFrame) -> DataFrame:
     pivoted = icp_metrics.pivot(
         index=["Country Code"],

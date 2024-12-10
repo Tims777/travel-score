@@ -13,7 +13,7 @@ DOWNLOAD_ARGS = {
 }
 
 
-@asset
+@asset(group_name="datasets")
 def inform_scores() -> DataFrame:
     url = DOWNLOAD_URL + "?" + urlencode(DOWNLOAD_ARGS)
     with urlopen(url) as resp:

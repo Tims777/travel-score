@@ -45,5 +45,5 @@ def test_pipeline():
             query = f"SELECT * FROM {RESULT_DATASET}"
             df = read_sql(sql=query, con=con)
         assert len_as_expected(df, N_COUNTRIES_AMERICAS, 0.25)
-        assert "px.wl" in df
+        assert "total consumption" in df
         assert "inform" in df

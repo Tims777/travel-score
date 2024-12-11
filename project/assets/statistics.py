@@ -7,7 +7,7 @@ from pandas import DataFrame
 
 @asset(group_name="visuals")
 def correlation(combined_dataset: GeoDataFrame) -> Figure:
-    price = combined_dataset["px.wl"]
+    price = combined_dataset["total consumption"]
     risk = combined_dataset["inform"]
     corr = price.corr(risk)
     fig = plt.figure()
@@ -26,8 +26,8 @@ def correlation(combined_dataset: GeoDataFrame) -> Figure:
 
 
 @asset(group_name="visuals")
-def pricelevel_histogram(icp_metrics_2021: DataFrame) -> Figure:
-    ax = icp_metrics_2021.plot.hist(column="PX.WL")
+def price_histogram(price_level: DataFrame) -> Figure:
+    ax = price_level.plot.hist(column="total consumption")
     return ax.get_figure()
 
 

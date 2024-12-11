@@ -10,7 +10,7 @@ def map_of_america(americas: GeoDataFrame) -> Figure:
 
 @asset(group_name="visuals")
 def price_map(combined_dataset: GeoDataFrame) -> Figure:
-    return combined_dataset.plot(column="px.wl").get_figure()
+    return combined_dataset.plot(column="total consumption").get_figure()
 
 
 @asset(group_name="visuals")

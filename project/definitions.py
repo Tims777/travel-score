@@ -4,11 +4,11 @@ from dagster import Definitions, load_assets_from_modules
 
 import project
 
-from .assets import combined, countries, icp, inform, maps, statistics
+from .assets import combined, countries, icp, inform, maps, osm, statistics
 from .resources.io_manager import LocalFileSystemIOManager
 
 all_assets = load_assets_from_modules(
-    [countries, icp, inform, combined, maps, statistics]
+    [countries, icp, inform, osm, combined, maps, statistics]
 )
 data_dir = environ.get("DAGSTER_HOME", Path(project.__file__).parents[1])
 

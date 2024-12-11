@@ -1,3 +1,13 @@
 [tool.dagster]
 module_name = "project.definitions"
 code_location_name = "travel-score"
+
+[tool.flake8]
+max-line-length = 127
+exclude = [
+    "__pycache__",
+    ".git",
+    ".pytest_cache",
+    ".venv",
+    "data",
+]

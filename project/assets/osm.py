@@ -1,18 +1,25 @@
+from collections import defaultdict
+from geopandas import GeoDataFrame
 from hashlib import md5
 from pathlib import Path
-from typing import Tuple
+from typing import Dict, Set, Tuple
 from urllib.parse import urljoin
 from urllib.request import Request, urlopen
 
 from dagster import (
     AssetExecutionContext,
-    AssetKey,
     AssetSpec,
+    EventLogEntry,
     MaterializeResult,
     MetadataValue,
     ResourceParam,
+    asset,
     multi_asset,
 )
+from osmium import FileProcessor
+from osmium.filter import KeyFilter
+from osmium.osm import NODE
+from shapely import Point
 
 from project.resources.io_manager import LocalFileSystemIOManager
 
@@ -28,20 +35,22 @@ SERVER = "https://download.geofabrik.de/"
 RANGE_REGEX = r"^bytes (\d+)-(\d+)/(\d+)$"
 CHUNK_SIZE = 1024 * 8
 
-Ctx = AssetExecutionContext
+PBF_ASSETS = {"_".join(["pbf"] + region.split("-")): region for region in REGIONS}
+
+OSM_KEYS = "amenity", "historic", "leisure", "natural", "shop", "tourism"
+RESOLUTION = 0
 
 
-def _get_local_checksum(ctx: Ctx, asset_key: AssetKey) -> str | None:
-    last_materialization = ctx.instance.get_latest_materialization_event(asset_key)
-    if not last_materialization:
+def _get_local_checksum(latest_materialization: EventLogEntry | None) -> str | None:
+    if not latest_materialization:
         return None
-    metadata = last_materialization.asset_materialization.metadata
+    metadata = latest_materialization.asset_materialization.metadata
     if "checksum" not in metadata:
         return None
     return metadata["checksum"].value
 
 
-def _get_online_checksum(_ctx: Ctx, region: str, version: str) -> str:
+def _get_online_checksum(region: str, version: str) -> str:
     filename = f"{region}-{version}.osm.pbf.md5"
     with urlopen(urljoin(SERVER, filename)) as resp:
         data = resp.read()
@@ -93,14 +102,31 @@ def _download_pbf(
         return outfile, written, checksum.digest().hex()
 
 
+type Coords = Tuple[int, int]
+type Features = Dict[set, Set[str]]
+type GeoBins = Dict[Coords, Features]
+
+
+def _process_pbf(pbf_file: str, bins: GeoBins) -> GeoBins:
+    fp = FileProcessor(pbf_file, NODE).with_filter(KeyFilter(*OSM_KEYS))
+    for obj in fp:
+        coords = tuple(
+            round(x, RESOLUTION) for x in (obj.location.lat, obj.location.lon)
+        )
+        for key in OSM_KEYS:
+            if key not in obj.tags:
+                continue
+            bins[coords][key].add(obj.tags[key])
+
+
 @multi_asset(
     specs=[
         AssetSpec(
-            f"{region}-pbf",
+            pbf,
             metadata={"region": region, "version": "latest"},
             skippable=True,
         )
-        for region in REGIONS
+        for pbf, region in PBF_ASSETS.items()
     ],
     can_subset=True,
     group_name="tempfiles",
@@ -114,20 +140,25 @@ def pbfs(
         region = metadata["region"]
         version = metadata["version"]
 
-        online_checksum = _get_online_checksum(context, region, version)
-        local_checksum = _get_local_checksum(context, key)
+        latest_materialization = context.instance.get_latest_materialization_event(key)
+        local_checksum = _get_local_checksum(latest_materialization)
+        online_checksum = _get_online_checksum(region, version)
 
-        if online_checksum == local_checksum:
-            context.log.info(f"{asset_name} ({version}): Already downloaded.")
-            return
+        if not local_checksum:
+            context.log.info(f"{asset_name} ({version}): Not previously materialized")
+            replace = False
+        elif online_checksum != local_checksum:
+            context.log.info(f"{asset_name} ({version}): Checksum mismatch")
+            replace = True
         else:
-            context.log.info(f"{asset_name} ({version}): Needs downloading.")
+            context.log.info(f"{asset_name} ({version}): Checksum okay")
+            return
 
         outfile, written, new_checksum = _download_pbf(
             region=region,
             version=version,
             outdir=io_manager.data_dir,
-            replace=local_checksum != online_checksum,
+            replace=replace,
         )
         context.log.info(f"Downloaded {written} bytes to {outfile}")
         context.log.info(f"Online checksum: {online_checksum}, local: {new_checksum}")
@@ -140,3 +171,27 @@ def pbfs(
                 "size (bytes)": MetadataValue.int(outfile.stat().st_size),
             },
         )
+
+
+@asset(group_name="datasets", deps=PBF_ASSETS.keys())
+def pbf_analysis(context: AssetExecutionContext) -> GeoDataFrame:
+    bins: GeoBins = defaultdict(lambda: defaultdict(set))
+    for key in context.instance.get_asset_keys():
+        if len(key.parts) != 1:
+            continue
+        [asset_name] = key.parts
+        if asset_name not in PBF_ASSETS:
+            continue
+        materialization = context.instance.get_latest_materialization_event(key)
+        if not materialization:
+            context.log.warning(f"{asset_name} has not been materialized yet!")
+            continue
+        metadata = materialization.asset_materialization.metadata
+        pbf_file = metadata["filepath"].value
+        context.log.info(f"Processing {pbf_file}")
+        _process_pbf(pbf_file, bins)
+    dps = []
+    for coords, features in bins.items():
+        geometry = {"geometry": Point(*reversed(coords))}
+        dps.append(geometry | features)
+    return GeoDataFrame(dps)

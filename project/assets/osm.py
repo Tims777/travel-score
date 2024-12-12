@@ -142,7 +142,7 @@ def _load_precomputed_analysis() -> GeoDataFrame:
         for pbf, region in PBF_ASSETS.items()
     ],
     can_subset=True,
-    group_name="tempfiles",
+    group_name="pbfs",
 )
 def pbfs(
     context: AssetExecutionContext, io_manager: ResourceParam[LocalFileSystemIOManager]

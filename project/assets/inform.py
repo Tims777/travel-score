@@ -12,12 +12,18 @@ DOWNLOAD_ARGS = {
 }
 
 
-@asset
+@asset(group_name="urls")
 def inform_scores_url() -> str:
     return DOWNLOAD_URL + "?" + urlencode(DOWNLOAD_ARGS)
 
 
 @asset(group_name="datasets")
-def inform_scores(inform_scores_url: str) -> DataFrame:
-    df = read_json(inform_scores_url)
-    return df.pivot(index="Iso3", columns="IndicatorId", values="IndicatorScore")
+def inform_scores_raw(inform_scores_url: str) -> DataFrame:
+    return read_json(inform_scores_url)
+
+
+@asset(group_name="datasets")
+def inform_scores(inform_scores_raw: DataFrame) -> DataFrame:
+    return inform_scores_raw.pivot(
+        index="Iso3", columns="IndicatorId", values="IndicatorScore"
+    )

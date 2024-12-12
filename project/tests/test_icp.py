@@ -1,9 +1,11 @@
 from pandas import DataFrame
+from pytest import mark
 from project.assets.icp import icp_metrics
 from project.tests.mocks import MOCKED_ICP_CYCLE
 from project.utils import N_COUNTRIES_WORLD, len_as_expected
 
 
+@mark.filterwarnings("ignore::DeprecationWarning")
 def test_icp_metrics():
     df = icp_metrics(MOCKED_ICP_CYCLE)
     assert isinstance(df, DataFrame)

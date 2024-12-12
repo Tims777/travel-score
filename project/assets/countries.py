@@ -8,7 +8,7 @@ AMERICA = ["North America", "South America"]
 EXCLUDE = ["Greenland"]
 
 
-@asset
+@asset(group_name="urls")
 def world_url():
     return DOWNLOAD_URL
 

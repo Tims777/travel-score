@@ -36,6 +36,8 @@ class LocalFileSystemIOManager(ConfigurableIOManager):
             outfile = path.with_suffix(DB_SUFFIX)
             obj.to_file(outfile, driver=DB_DRIVER, encoding=ENCODING)
             meta["num_records"] = len(obj)
+            non_geo_cols = obj.columns.difference([obj.active_geometry_name])
+            meta["preview"] = MetadataValue.md(obj[non_geo_cols].head().to_markdown())
         elif isinstance(obj, DataFrame):
             outfile = path.with_suffix(DB_SUFFIX)
             with connect(outfile) as con:

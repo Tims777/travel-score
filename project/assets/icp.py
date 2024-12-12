@@ -1,4 +1,5 @@
 from io import BytesIO
+from os import environ
 from re import match, sub
 from urllib.parse import urlencode
 from zipfile import ZipFile
@@ -32,7 +33,11 @@ def extract_name(title: str):
 
 
 @asset(group_name="urls")
-def icp_metrics_url() -> str:
+def icp_metrics_url(context: AssetExecutionContext) -> str:
+    injected_url = environ.get("INJECTED_ICP_METRICS_URL")
+    if injected_url:
+        context.log.info(f"Using injected ICP metrics url: {injected_url}")
+        return injected_url
     request = Request(PREPARE_URL, data=urlencode(PREPARE_ARGS).encode(), method="POST")
     with urlopen(request) as response:
         download_args = response.read()

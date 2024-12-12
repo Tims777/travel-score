@@ -1,5 +1,6 @@
 from collections import defaultdict
-from geopandas import GeoDataFrame
+from os import environ
+from geopandas import GeoDataFrame, read_file
 from hashlib import md5
 from pathlib import Path
 from typing import Dict, Set, Tuple
@@ -21,7 +22,7 @@ from osmium.filter import KeyFilter
 from osmium.osm import NODE
 from shapely import Point
 
-from project.resources.io_manager import LocalFileSystemIOManager
+from project.resources.io_manager import ENCODING, LocalFileSystemIOManager
 
 
 REGIONS = [
@@ -175,6 +176,10 @@ def pbfs(
 
 @asset(group_name="datasets", deps=PBF_ASSETS.keys())
 def pbf_analysis(context: AssetExecutionContext) -> GeoDataFrame:
+    injected_analysis = environ.get("INJECTED_PBF_ANALYSIS")
+    if injected_analysis:
+        context.log.info(f"Using injected PBF analysis data: {injected_analysis}")
+        return read_file(injected_analysis, encoding=ENCODING)
     bins: GeoBins = defaultdict(lambda: defaultdict(set))
     for key in context.instance.get_asset_keys():
         if len(key.parts) != 1:

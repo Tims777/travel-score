@@ -1,5 +1,6 @@
 from pandas import DataFrame
 from project.assets.inform import inform_scores
+from project.tests.mocks import MOCKED_INFORM_RISK
 from project.utils import N_COUNTRIES_WORLD, len_as_expected
 
 
@@ -8,7 +9,7 @@ COLUMNS = ["CC", "HA", "VU", "INFORM"]
 
 
 def test_inform_scores():
-    df = inform_scores()
+    df = inform_scores(MOCKED_INFORM_RISK)
     assert isinstance(df, DataFrame)
     assert df.index.names == INDEX
     assert df.columns.difference(COLUMNS).empty

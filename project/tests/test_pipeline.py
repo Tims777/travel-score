@@ -5,11 +5,9 @@ from subprocess import run
 from sys import executable as python
 from tempfile import TemporaryDirectory
 from warnings import warn
-
 from pandas import read_sql
+
 import project
-from project.tests.test_icp import SELF_HOSTED_ICP_METRICS
-from project.tests.test_osm import PRECOMPUTED_PBF_ANALYSIS
 from project.utils import N_COUNTRIES_AMERICAS, len_as_expected
 
 
@@ -20,8 +18,7 @@ def test_pipeline():
     with TemporaryDirectory(ignore_cleanup_errors=True) as datadir:
         env = environ.copy()
         env["DAGSTER_HOME"] = datadir
-        env["INJECTED_ICP_METRICS_URL"] = SELF_HOSTED_ICP_METRICS
-        env["INJECTED_PBF_ANALYSIS"] = PRECOMPUTED_PBF_ANALYSIS
+        env["SKIP_PBF_ANALYSIS"] = "yes"
         cwd = Path(project.__file__).parents[1]
         result = run(
             executable=python,

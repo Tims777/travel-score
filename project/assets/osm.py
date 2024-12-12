@@ -1,5 +1,7 @@
 from collections import defaultdict
+from io import BytesIO
 from os import environ
+from zipfile import ZipFile
 from geopandas import GeoDataFrame, read_file
 from hashlib import md5
 from pathlib import Path
@@ -23,6 +25,7 @@ from osmium.osm import NODE
 from shapely import Point
 
 from project.resources.io_manager import ENCODING, LocalFileSystemIOManager
+from project.tests.mocks import PRECOMPUTED_PBF_ANALYSIS
 
 
 REGIONS = [
@@ -120,6 +123,15 @@ def _process_pbf(pbf_file: str, bins: GeoBins) -> GeoBins:
             bins[coords][key].add(obj.tags[key])
 
 
+def _load_precomputed_analysis() -> GeoDataFrame:
+    with urlopen(PRECOMPUTED_PBF_ANALYSIS) as resp:
+        data = resp.read()
+    with ZipFile(BytesIO(data)) as zip:
+        [file] = zip.filelist
+        with zip.open(file) as fd:
+            return read_file(fd, encoding=ENCODING)
+
+
 @multi_asset(
     specs=[
         AssetSpec(
@@ -176,10 +188,8 @@ def pbfs(
 
 @asset(group_name="datasets", deps=PBF_ASSETS.keys())
 def pbf_analysis(context: AssetExecutionContext) -> GeoDataFrame:
-    injected_analysis = environ.get("INJECTED_PBF_ANALYSIS")
-    if injected_analysis:
-        context.log.info(f"Using injected PBF analysis data: {injected_analysis}")
-        return read_file(injected_analysis, encoding=ENCODING)
+    if environ.get("SKIP_PBF_ANALYSIS"):
+        return _load_precomputed_analysis()
     bins: GeoBins = defaultdict(lambda: defaultdict(set))
     for key in context.instance.get_asset_keys():
         if len(key.parts) != 1:

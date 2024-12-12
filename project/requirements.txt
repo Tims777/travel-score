@@ -2,3 +2,4 @@ dagster
 pandas
 geopandas
 matplotlib
+osmium

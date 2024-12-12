@@ -12,6 +12,11 @@ from matplotlib.figure import Figure
 
 from project.assets.osm import OSM_KEYS
 
+MISSING_VALUES_STYLE = {
+    "color": "lightgrey",
+    "label": "Missing values",
+}
+
 
 @asset(group_name="visuals")
 def map_of_america(americas: GeoDataFrame) -> Figure:
@@ -20,17 +25,43 @@ def map_of_america(americas: GeoDataFrame) -> Figure:
 
 @asset(group_name="visuals")
 def price_map(combined_dataset: GeoDataFrame) -> Figure:
-    return combined_dataset.plot(column="total consumption").get_figure()
+    return combined_dataset.plot(
+        column="total consumption",
+        missing_kwds=MISSING_VALUES_STYLE,
+        legend=True,
+    ).get_figure()
 
 
 @asset(group_name="visuals")
 def risk_map(combined_dataset: GeoDataFrame) -> Figure:
-    return combined_dataset.plot(column="inform").get_figure()
+    return combined_dataset.plot(
+        column="inform",
+        missing_kwds=MISSING_VALUES_STYLE,
+        legend=True,
+    ).get_figure()
+
+
+@asset(group_name="visuals")
+def tourism_map(combined_dataset: GeoDataFrame) -> Figure:
+    return combined_dataset.plot(
+        column="tourism_score",
+        missing_kwds=MISSING_VALUES_STYLE,
+        legend=True,
+    ).get_figure()
+
+
+@asset(group_name="visuals")
+def travel_score_map(travel_score: GeoDataFrame) -> Figure:
+    return travel_score.plot(
+        column="travel_score",
+        missing_kwds=MISSING_VALUES_STYLE,
+        legend=True,
+    ).get_figure()
 
 
 @multi_asset(
     outs={
-        f"{key}_map": AssetOut(
+        f"pbf_{key}_map": AssetOut(
             dagster_type=Figure,
             metadata={"osm_key": key},
             is_required=False,
@@ -55,5 +86,20 @@ def pbf_maps(
         gdf[count_col] = gdf[set_col].apply(lambda x: len(x) if x else 0)
 
         # Create map
-        fig = gdf.plot(column=count_col, legend=True, markersize=2).get_figure()
+        fig = gdf.plot(
+            column=count_col,
+            legend=True,
+            markersize=1,
+        ).get_figure()
         yield Output(fig, output_name=asset_name)
+
+
+@asset(group_name="visuals")
+def geobinning_test_map(tourism_score: GeoDataFrame) -> Figure:
+    gdf = tourism_score
+    fig = gdf.plot(
+        column="iso_a3",
+        legend=True,
+        markersize=1,
+    ).get_figure()
+    return fig

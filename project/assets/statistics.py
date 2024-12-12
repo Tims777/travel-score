@@ -27,11 +27,9 @@ def correlation(combined_dataset: GeoDataFrame) -> Figure:
 
 @asset(group_name="visuals")
 def price_histogram(price_level: DataFrame) -> Figure:
-    ax = price_level.plot.hist(column="total consumption")
-    return ax.get_figure()
+    return price_level.plot.hist(column="total consumption").get_figure()
 
 
 @asset(group_name="visuals")
-def risk_histogramm(inform_scores: DataFrame) -> Figure:
-    ax = inform_scores.plot.hist(column="INFORM")
-    return ax.get_figure()
+def risk_histogram(inform_scores: DataFrame) -> Figure:
+    return inform_scores.plot.hist(column="INFORM").get_figure()

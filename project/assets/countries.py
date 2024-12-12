@@ -5,7 +5,6 @@ DOWNLOAD_URL = (
     "https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip"
 )
 AMERICA = ["North America", "South America"]
-EXCLUDE = ["Greenland"]
 
 
 @asset(group_name="urls")
@@ -20,5 +19,6 @@ def world(world_url: str) -> GeoDataFrame:
 
 @asset(group_name="datasets")
 def americas(world: GeoDataFrame) -> GeoDataFrame:
-    americas = world[world["continent"].isin(AMERICA) & ~world["name"].isin(EXCLUDE)]
-    return GeoDataFrame(americas)
+    americas = world[world["continent"].isin(AMERICA)]
+    assert isinstance(americas, GeoDataFrame)
+    return americas[[americas.active_geometry_name, "iso_a3", "name"]]

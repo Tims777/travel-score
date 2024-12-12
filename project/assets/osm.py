@@ -1,3 +1,4 @@
+from ast import literal_eval
 from collections import defaultdict
 from io import BytesIO
 from os import environ
@@ -19,9 +20,11 @@ from dagster import (
     asset,
     multi_asset,
 )
+from numpy import mean
 from osmium import FileProcessor
 from osmium.filter import KeyFilter
 from osmium.osm import NODE
+from pandas import DataFrame, NamedAgg
 from shapely import Point
 
 from project.resources.io_manager import ENCODING, LocalFileSystemIOManager
@@ -210,3 +213,28 @@ def pbf_analysis(context: AssetExecutionContext) -> GeoDataFrame:
         geometry = {"geometry": Point(*reversed(coords))}
         dps.append(geometry | features)
     return GeoDataFrame(dps)
+
+
+@asset(group_name="datasets")
+def tourism_score(pbf_analysis: GeoDataFrame, world: GeoDataFrame) -> DataFrame:
+    # Prepare pbf_analysis dataset
+    non_geo = pbf_analysis.columns.difference([pbf_analysis.active_geometry_name])
+    pbf_analysis[non_geo] = pbf_analysis[non_geo].map(literal_eval, na_action="ignore")
+
+    # Prepare world dataset
+    world = world[[world.active_geometry_name, "iso_a3"]]
+    world = world[world["iso_a3"] != "-99"]
+    assert "-99" not in world["iso_a3"].values
+
+    # Perform spatial join to map points to countries
+    gdf: GeoDataFrame = pbf_analysis.sjoin(world, how="left")
+    gdf = gdf[gdf["iso_a3"].notna()]
+    assert isinstance(gdf, GeoDataFrame)
+
+    # Count values, find maximum and normalize
+    gdf["tourism_count"] = gdf["tourism"].apply(lambda x: len(x) if x else 0)
+    df = gdf.groupby("iso_a3").agg(
+        **{"tourism_count_max": NamedAgg(column="tourism_count", aggfunc="max")}
+    )
+    df["tourism_score"] = df["tourism_count_max"] / mean(df["tourism_count_max"])
+    return df

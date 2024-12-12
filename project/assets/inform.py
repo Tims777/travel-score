@@ -1,5 +1,4 @@
 from urllib.parse import urlencode
-from urllib.request import urlopen
 from dagster import asset
 from pandas import DataFrame, read_json
 
@@ -13,9 +12,12 @@ DOWNLOAD_ARGS = {
 }
 
 
+@asset
+def inform_scores_url() -> str:
+    return DOWNLOAD_URL + "?" + urlencode(DOWNLOAD_ARGS)
+
+
 @asset(group_name="datasets")
-def inform_scores() -> DataFrame:
-    url = DOWNLOAD_URL + "?" + urlencode(DOWNLOAD_ARGS)
-    with urlopen(url) as resp:
-        df = read_json(resp)
+def inform_scores(inform_scores_url: str) -> DataFrame:
+    df = read_json(inform_scores_url)
     return df.pivot(index="Iso3", columns="IndicatorId", values="IndicatorScore")

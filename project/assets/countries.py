@@ -8,9 +8,14 @@ AMERICA = ["North America", "South America"]
 EXCLUDE = ["Greenland"]
 
 
+@asset
+def world_url():
+    return DOWNLOAD_URL
+
+
 @asset(group_name="datasets")
-def world() -> GeoDataFrame:
-    return read_file(DOWNLOAD_URL)
+def world(world_url: str) -> GeoDataFrame:
+    return read_file(world_url)
 
 
 @asset(group_name="datasets")

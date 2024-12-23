@@ -13,6 +13,7 @@ from urllib.request import Request, urlopen
 from dagster import (
     AssetExecutionContext,
     AssetSpec,
+    Config,
     EventLogEntry,
     MaterializeResult,
     MetadataValue,
@@ -46,6 +47,8 @@ PBF_ASSETS = {"_".join(["pbf"] + region.split("-")): region for region in REGION
 
 OSM_KEYS = "amenity", "historic", "leisure", "natural", "shop", "tourism"
 RESOLUTION = 0
+
+YES = ("yes", "true", "1")
 
 
 def _get_local_checksum(latest_materialization: EventLogEntry | None) -> str | None:
@@ -189,12 +192,19 @@ def pbfs(
         )
 
 
+class PBFAnalysisConfig(Config):
+    skip_analysis: bool = environ.get("SKIP_PBF_ANALYSIS", "").lower() in YES
+
+
 @asset(group_name="datasets", deps=PBF_ASSETS.keys())
-def pbf_analysis(context: AssetExecutionContext) -> GeoDataFrame:
-    if environ.get("SKIP_PBF_ANALYSIS"):
+def pbf_analysis(
+    context: AssetExecutionContext, config: PBFAnalysisConfig
+) -> GeoDataFrame:
+    if config.skip_analysis:
         return _load_precomputed_analysis()
+    keys = context.instance.get_asset_keys()
     bins: GeoBins = defaultdict(lambda: defaultdict(set))
-    for key in context.instance.get_asset_keys():
+    for key in keys:
         if len(key.parts) != 1:
             continue
         [asset_name] = key.parts

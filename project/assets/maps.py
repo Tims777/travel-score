@@ -95,8 +95,8 @@ def pbf_maps(
 
 
 @asset(group_name="visuals")
-def geobinning_test_map(tourism_score: GeoDataFrame) -> Figure:
-    gdf = tourism_score
+def geobinning_test_map(pbf_analysis: GeoDataFrame, world: GeoDataFrame) -> Figure:
+    gdf = pbf_analysis.sjoin(world, how="left")
     fig = gdf.plot(
         column="iso_a3",
         legend=True,

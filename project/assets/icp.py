@@ -32,7 +32,7 @@ def extract_name(title: str):
 
 
 @asset(group_name="urls")
-def icp_metrics_url(context: AssetExecutionContext) -> str:
+def icp_metrics_url() -> str:
     request = Request(PREPARE_URL, data=urlencode(PREPARE_ARGS).encode(), method="POST")
     with urlopen(request) as response:
         download_args = response.read()
@@ -82,6 +82,6 @@ def price_level(context: AssetExecutionContext, icp_metrics: DataFrame) -> DataF
 
     # Rename columns to be more human readable
     df.rename(columns=lambda x: extract_name(x).lower(), inplace=True)
-    df.rename_axis(INDEX_COLS[2].lower(), axis=0, inplace=True)
+    df.rename_axis("iso", inplace=True)
 
     return df

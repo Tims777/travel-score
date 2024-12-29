@@ -247,4 +247,5 @@ def tourism_score(pbf_analysis: GeoDataFrame, world: GeoDataFrame) -> DataFrame:
         **{"tourism_count_max": NamedAgg(column="tourism_count", aggfunc="max")}
     )
     df["tourism_score"] = df["tourism_count_max"] / mean(df["tourism_count_max"])
+    df.rename_axis("iso", inplace=True)
     return df

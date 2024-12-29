@@ -11,19 +11,16 @@ def combined_dataset(
     tourism_score: DataFrame,
 ) -> GeoDataFrame:
     result = americas
-    result = result.merge(inform_scores, left_on="iso_a3", right_on="Iso3", how="left")
-    result = result.merge(
-        price_level, left_on="iso_a3", right_on="country code", how="left"
-    )
-    result = result.merge(
-        tourism_score, left_on="iso_a3", right_on="iso_a3", how="left"
-    )
+    result = result.merge(inform_scores, on="iso", how="left")
+    result = result.merge(price_level, on="iso", how="left")
+    result = result.merge(tourism_score, on="iso", how="left")
+    result.set_index("iso", inplace=True)
     return result
 
 
 @asset(group_name="datasets")
 def travel_score(combined_dataset: GeoDataFrame) -> GeoDataFrame:
-    gdf = combined_dataset[[combined_dataset.active_geometry_name, "iso_a3"]]
+    gdf = combined_dataset[[combined_dataset.active_geometry_name, "iso"]]
     gdf["travel_score"] = (
         (combined_dataset["tourism_score"])
         * (100 / combined_dataset["total consumption"])

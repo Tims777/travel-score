@@ -21,4 +21,7 @@ def world(world_url: str) -> GeoDataFrame:
 def americas(world: GeoDataFrame) -> GeoDataFrame:
     americas = world[world["continent"].isin(AMERICA)]
     assert isinstance(americas, GeoDataFrame)
-    return americas[[americas.active_geometry_name, "iso_a3", "name"]]
+    americas = americas[[americas.active_geometry_name, "iso_a3", "name"]]
+    americas.set_index("iso_a3", inplace=True)
+    americas.rename_axis("iso", inplace=True)
+    return americas

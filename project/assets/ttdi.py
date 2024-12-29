@@ -24,6 +24,6 @@ def ttdi(ttdi_raw: DataFrame) -> DataFrame:
     df.columns = MultiIndex.from_tuples([literal_eval(x) for x in df.columns])
     df = df.loc[:, (slice(None), "2024 Value")]
     df = df.droplevel(1, axis=1)
-    df.rename(columns=lambda x: x.replace("\n", " ").lower(), inplace=True)
+    df.rename(columns=lambda x: x.replace("\n", " ").lower().strip(), inplace=True)
     df.rename_axis("iso", inplace=True)
     return df

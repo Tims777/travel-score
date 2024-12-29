@@ -64,7 +64,7 @@ class LocalFileSystemIOManager(ConfigurableIOManager):
         query = f"SELECT * FROM {table}"
         if type == GeoDataFrame:
             infile = path.with_suffix(DB_SUFFIX)
-            return GeoDataFrame(read_file(infile, sql=query, encoding=ENCODING))
+            return read_file(infile, sql=query, encoding=ENCODING)
         elif type == DataFrame:
             infile = path.with_suffix(DB_SUFFIX)
             with connect(infile) as con:

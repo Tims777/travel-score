@@ -226,26 +226,47 @@ def pbf_analysis(
 
 
 @asset(group_name="datasets")
-def tourism_score(pbf_analysis: GeoDataFrame, world: GeoDataFrame) -> DataFrame:
+def resources_score(pbf_analysis: GeoDataFrame, world: GeoDataFrame) -> DataFrame:
     # Prepare pbf_analysis dataset
     non_geo = pbf_analysis.columns.difference([pbf_analysis.active_geometry_name])
     pbf_analysis[non_geo] = pbf_analysis[non_geo].map(literal_eval, na_action="ignore")
 
     # Prepare world dataset
-    world = world[[world.active_geometry_name, "iso_a3"]]
-    world = world[world["iso_a3"] != "-99"]
-    assert "-99" not in world["iso_a3"].values
+    world.set_index("iso_a3", inplace=True)
+    world.drop(index="-99", inplace=True)
+    world.rename_axis("iso", inplace=True)
+    world = world[[world.active_geometry_name]]
 
     # Perform spatial join to map points to countries
-    gdf: GeoDataFrame = pbf_analysis.sjoin(world, how="left")
-    gdf = gdf[gdf["iso_a3"].notna()]
+    gdf = pbf_analysis.sjoin(world, how="left")
+    gdf = gdf[gdf["iso"].notna()]
     assert isinstance(gdf, GeoDataFrame)
 
-    # Count values, find maximum and normalize
-    gdf["tourism_count"] = gdf["tourism"].apply(lambda x: len(x) if x else 0)
-    df = gdf.groupby("iso_a3").agg(
-        **{"tourism_count_max": NamedAgg(column="tourism_count", aggfunc="max")}
-    )
-    df["tourism_score"] = df["tourism_count_max"] / mean(df["tourism_count_max"])
-    df.rename_axis("iso", inplace=True)
-    return df
+    # Count values
+    for key in OSM_KEYS:
+        count_field = f"{key} count"
+        gdf[count_field] = gdf[key].apply(lambda x: len(x) if x else 0)
+
+    # Aggregate counts by country
+    result = DataFrame(index=gdf["iso"].unique())
+    grouped = gdf.groupby("iso")
+    for key in OSM_KEYS:
+        count_field = f"{key} count"
+        score_field = f"{key} score"
+        max_field = f"{key} max"
+        min_field = f"{key} min"
+        avg_field = f"{key} avg"
+        result = result.join(
+            grouped.agg(
+                **{
+                    max_field: NamedAgg(column=count_field, aggfunc="max"),
+                    min_field: NamedAgg(column=count_field, aggfunc="min"),
+                    avg_field: NamedAgg(column=count_field, aggfunc="mean"),
+                }
+            )
+        )
+        result[score_field] = result[max_field] / mean(result[max_field])
+
+    # Rename axis and return
+    result.rename_axis("iso", inplace=True)
+    return result

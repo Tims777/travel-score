@@ -41,19 +41,19 @@ def risk_map(combined_dataset: GeoDataFrame) -> Figure:
     ).get_figure()
 
 
-@asset(group_name="visuals")
-def tourism_map(combined_dataset: GeoDataFrame) -> Figure:
-    return combined_dataset.plot(
-        column="tourism_score",
-        missing_kwds=MISSING_VALUES_STYLE,
-        legend=True,
-    ).get_figure()
+# @asset(group_name="visuals")
+# def tourism_map(combined_dataset: GeoDataFrame) -> Figure:
+#     return combined_dataset.plot(
+#         column="tourism_score",
+#         missing_kwds=MISSING_VALUES_STYLE,
+#         legend=True,
+#     ).get_figure()
 
 
 @asset(group_name="visuals")
 def travel_score_map(travel_score: GeoDataFrame) -> Figure:
     return travel_score.plot(
-        column="travel_score",
+        column="travel score",
         missing_kwds=MISSING_VALUES_STYLE,
         legend=True,
     ).get_figure()

@@ -5,8 +5,8 @@ from project.tests.mocks import MOCKED_INFORM_RISK
 from project.utils import N_COUNTRIES_WORLD, len_as_expected
 
 
-INDEX = ["Iso3"]
-COLUMNS = ["CC", "HA", "VU", "INFORM"]
+INDEX = ["iso"]
+COLUMNS = ["lack of coping capacity", "hazard & exposure", "vulnerability index", "inform risk index"]
 
 
 @mark.filterwarnings("ignore::DeprecationWarning")

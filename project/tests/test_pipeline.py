@@ -61,7 +61,8 @@ def _check_output(datadir):
         df = read_sql(sql=query, con=con)
     assert len_as_expected(df, N_COUNTRIES_AMERICAS, 0.25)
     assert "total consumption" in df
-    assert "inform" in df
+    assert "inform risk index" in df
+    assert "tourism_score" in df
 
 
 @mark.filterwarnings("ignore::dagster.ExperimentalWarning")

@@ -1,8 +1,7 @@
 from json import loads
 from urllib.parse import urlencode
 from urllib.request import urlopen
-from dagster import AssetExecutionContext, asset
-from numpy import nan
+from dagster import asset
 from pandas import DataFrame, read_json
 
 
@@ -39,9 +38,7 @@ def inform_scores_raw(inform_scores_url: str) -> DataFrame:
 
 
 @asset(group_name="datasets")
-def inform_scores(
-    context: AssetExecutionContext, inform_scores_raw: DataFrame
-) -> DataFrame:
+def inform_scores(inform_scores_raw: DataFrame) -> DataFrame:
     # Lowercase all indicator ids
     df = inform_scores_raw
     df["IndicatorId"] = df["IndicatorId"].map(str.lower)
@@ -55,7 +52,7 @@ def inform_scores(
     df = df.pivot(index="Iso3", columns="IndicatorId", values="IndicatorScore")
 
     # Keep selected indicators and rename columns titles
-    df = df[TOP_LEVEL_INDICATORS.keys()]
+    df = df[(k for k in TOP_LEVEL_INDICATORS.keys() if k in df)]
     df.rename(columns=lambda x: TOP_LEVEL_INDICATORS.get(x), inplace=True)
     df.rename_axis("iso", inplace=True)
     return df

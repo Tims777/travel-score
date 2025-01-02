@@ -18,17 +18,31 @@ def combined_dataset(
     return result
 
 
+def _normalize(df: DataFrame, col: str):
+    min = df[col].min()
+    max = df[col].max()
+    df[col] = 2.0 * (df[col] - min) / (max - min)
+
+
 @asset(group_name="datasets")
 def travel_score(combined_dataset: GeoDataFrame) -> GeoDataFrame:
-    combined_dataset.set_index("iso", inplace=True)
-    gdf = combined_dataset[[combined_dataset.active_geometry_name]]
-    gdf["travel score"] = (
-        1.0
-        * (100 / combined_dataset["actual individual consumption"])
-        * (5 / (combined_dataset["hazard & exposure"]))
-        * (5 / (combined_dataset["lack of coping capacity"]))
-        * (combined_dataset["tourism score"])
-        * (combined_dataset["natural score"])
-        * (combined_dataset["historic score"])
+    # Prepare dataframes
+    df = combined_dataset
+    df.set_index("iso", inplace=True)
+    gdf = df[[df.active_geometry_name]]
+
+    # Calculate base indicators
+    gdf["safety"] = 1 / (df["hazard & exposure"] + df["lack of coping capacity"])
+    gdf["affordability"] = 1 / (df["actual individual consumption"])
+    gdf["attractiveness"] = (
+        df["natural score"] + df["historic score"] + df["tourism score"]
     )
+
+    # Normalize base indicators
+    for col in ("safety", "affordability", "attractiveness"):
+        _normalize(gdf, col)
+
+    # Calculate total score
+    gdf["total score"] = gdf["safety"] * gdf["affordability"] * gdf["attractiveness"]
+
     return gdf

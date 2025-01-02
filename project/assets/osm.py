@@ -26,8 +26,9 @@ from osmium import FileProcessor
 from osmium.filter import KeyFilter
 from osmium.osm import NODE
 from pandas import DataFrame, NamedAgg
-from shapely import Point
+from shapely import Polygon
 
+from project.assets.utils import CHUNK_SIZE, YES
 from project.resources.io_manager import ENCODING, LocalFileSystemIOManager
 from project.tests.mocks import PRECOMPUTED_PBF_ANALYSIS
 
@@ -40,15 +41,10 @@ REGIONS = [
 VERSION = "latest"
 SERVER = "https://download.geofabrik.de/"
 
-RANGE_REGEX = r"^bytes (\d+)-(\d+)/(\d+)$"
-CHUNK_SIZE = 1024 * 8
-
 PBF_ASSETS = {"_".join(["pbf"] + region.split("-")): region for region in REGIONS}
 
 OSM_KEYS = "amenity", "historic", "leisure", "natural", "shop", "tourism"
-RESOLUTION = 0
-
-YES = ("yes", "true", "1")
+DEFAULT_RESOLUTION = 2
 
 
 def _get_local_checksum(latest_materialization: EventLogEntry | None) -> str | None:
@@ -117,16 +113,22 @@ type Features = Dict[set, Set[str]]
 type GeoBins = Dict[Coords, Features]
 
 
-def _process_pbf(pbf_file: str, bins: GeoBins) -> GeoBins:
+def _process_pbf(pbf_file: str, bins: GeoBins, res: float) -> GeoBins:
     fp = FileProcessor(pbf_file, NODE).with_filter(KeyFilter(*OSM_KEYS))
     for obj in fp:
         coords = tuple(
-            round(x, RESOLUTION) for x in (obj.location.lat, obj.location.lon)
+            round(c * res) / res for c in (obj.location.lon, obj.location.lat)
         )
         for key in OSM_KEYS:
             if key not in obj.tags:
                 continue
             bins[coords][key].add(obj.tags[key])
+
+
+def _square(coords: Coords, res: float):
+    x, y = coords
+    d = 1 / (res * 2)
+    return ((x - d, y - d), (x + d, y - d), (x + d, y + d), (x - d, y + d))
 
 
 def _load_precomputed_analysis() -> GeoDataFrame:
@@ -194,6 +196,7 @@ def pbfs(
 
 class PBFAnalysisConfig(Config):
     skip_analysis: bool = environ.get("SKIP_PBF_ANALYSIS", "").lower() in YES
+    resolution: float = DEFAULT_RESOLUTION
 
 
 @asset(group_name="datasets", deps=PBF_ASSETS.keys())
@@ -201,6 +204,7 @@ def pbf_analysis(
     context: AssetExecutionContext, config: PBFAnalysisConfig
 ) -> GeoDataFrame:
     if config.skip_analysis:
+        context.log.info("Loading precomputed PBF analysis.")
         return _load_precomputed_analysis()
     keys = context.instance.get_asset_keys()
     bins: GeoBins = defaultdict(lambda: defaultdict(set))
@@ -217,10 +221,10 @@ def pbf_analysis(
         metadata = materialization.asset_materialization.metadata
         pbf_file = metadata["filepath"].value
         context.log.info(f"Processing {pbf_file}")
-        _process_pbf(pbf_file, bins)
+        _process_pbf(pbf_file, bins, config.resolution)
     dps = []
     for coords, features in bins.items():
-        geometry = {"geometry": Point(*reversed(coords))}
+        geometry = {"geometry": Polygon(_square(coords, config.resolution))}
         dps.append(geometry | features)
     return GeoDataFrame(dps)
 

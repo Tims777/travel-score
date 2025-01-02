@@ -18,45 +18,39 @@ MISSING_VALUES_STYLE = {
 }
 
 
-@asset(group_name="visuals")
-def map_of_america(americas: GeoDataFrame) -> Figure:
-    return americas.plot().get_figure()
-
-
-@asset(group_name="visuals")
-def price_map(combined_dataset: GeoDataFrame) -> Figure:
-    return combined_dataset.plot(
-        column="total consumption",
+def _plot(gdf: GeoDataFrame, column: str) -> Figure:
+    ax = gdf.plot.geo(
+        column=column,
         missing_kwds=MISSING_VALUES_STYLE,
         legend=True,
-    ).get_figure()
+    )
+    ax.set_axis_off()
+    return ax.get_figure()
 
 
 @asset(group_name="visuals")
-def risk_map(combined_dataset: GeoDataFrame) -> Figure:
-    return combined_dataset.plot(
-        column="inform",
-        missing_kwds=MISSING_VALUES_STYLE,
-        legend=True,
-    ).get_figure()
+def affordability_map(travel_score: GeoDataFrame) -> Figure:
+    return _plot(travel_score, "affordability")
 
 
-# @asset(group_name="visuals")
-# def tourism_map(combined_dataset: GeoDataFrame) -> Figure:
-#     return combined_dataset.plot(
-#         column="tourism_score",
-#         missing_kwds=MISSING_VALUES_STYLE,
-#         legend=True,
-#     ).get_figure()
+@asset(group_name="visuals")
+def safety_map(travel_score: GeoDataFrame) -> Figure:
+    return _plot(travel_score, "safety")
+
+
+@asset(group_name="visuals")
+def attractiveness_map(travel_score: GeoDataFrame) -> Figure:
+    return _plot(travel_score, "attractiveness")
 
 
 @asset(group_name="visuals")
 def travel_score_map(travel_score: GeoDataFrame) -> Figure:
-    return travel_score.plot(
-        column="travel score",
-        missing_kwds=MISSING_VALUES_STYLE,
-        legend=True,
-    ).get_figure()
+    return _plot(travel_score, column="total score")
+
+
+@asset(group_name="visuals")
+def map_of_america(americas: GeoDataFrame) -> Figure:
+    return _plot(americas, "continent")
 
 
 @multi_asset(
@@ -86,20 +80,11 @@ def pbf_maps(
         gdf[count_col] = gdf[set_col].apply(lambda x: len(x) if x else 0)
 
         # Create map
-        fig = gdf.plot(
-            column=count_col,
-            legend=True,
-            markersize=1,
-        ).get_figure()
+        fig = _plot(gdf, count_col)
         yield Output(fig, output_name=asset_name)
 
 
 @asset(group_name="visuals")
 def geobinning_test_map(pbf_analysis: GeoDataFrame, world: GeoDataFrame) -> Figure:
     gdf = pbf_analysis.sjoin(world, how="left")
-    fig = gdf.plot(
-        column="iso_a3",
-        legend=True,
-        markersize=1,
-    ).get_figure()
-    return fig
+    return _plot(gdf, "mapcolor7")

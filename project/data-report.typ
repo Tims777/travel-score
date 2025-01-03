@@ -1,19 +1,16 @@
 #import "@preview/glossarium:0.5.1": *
 #show: make-glossary
 
+#let licenses = yaml("report/licenses.yml")
 #let entry-list = (
-  (
-    key: "cc-by-4",
-    short: "CC-BY 4.0",
-    long: "Creative Commons Attribution 4.0",
-    description: [ #link("https://creativecommons.org/licenses/by/4.0/")],
-  ),
-  (
-    key: "public-domain",
-    short: "CC0",
-    long: "public domain",
-    description: [ #link("https://creativecommons.org/publicdomain/") ],
-  ),
+  licenses
+    .pairs()
+    .map(((k, v)) => (
+      key: k,
+      short: v.short,
+      long: v.long,
+      description: link(v.url),
+    ))
 )
 #register-glossary(entry-list)
 
@@ -59,7 +56,7 @@ After the largely unmodified datasets have been stored (see @io), sub-datasets a
 All original datasets or one of their sub-datasets are eventually merged into a `combined_dataset`. This dataset can then be used to produce derivatives like visualizations and it will serve as the ground truth for the travel score calculation in the future.
 
 #figure(
-  image("media/web-ui-pipeline.png", width: 80%),
+  image("report/media/web-ui-pipeline.png", width: 80%),
   caption: "The pipeline structure as seen in the Dagster Web UI.",
 )
 
@@ -82,7 +79,7 @@ In the spirit of rapid prototyping, this problem has been worked around for now 
 There are no automatic meta quality measures in place yet. However, it is easily possible to manually review the meta quality using Dagsters Web UI, by looking at the metadata which is added to each assets by the custom IO-manager. Additionally, the use of the SQLite format as discussed in @io allows for straightforward inspection of the full datasets.
 
 #figure(
-  image("media/web-ui-metadata.png", width: 80%),
+  image("report/media/web-ui-metadata.png", width: 80%),
   caption: "Per-dataset metadata as seen in the Dagster Web UI.",
 )
 
@@ -93,8 +90,7 @@ The main output of my current data pipeline is the combined dataset described in
 #figure(
   grid(
     columns: 2,
-    image("../data/risk_map.svg", width: 100%),
-    image("../data/price_map.svg", width: 100%),
+    image("report/media/risk_map.svg", width: 100%), image("report/media/price_map.svg", width: 100%),
   ),
   caption: [Visualizations of the combined dataset, indicators `INFORM` (left) and `PX.WL` (right).],
 )
@@ -109,4 +105,4 @@ As discussed in @io, the SQLite format was chosen for all assets. In practice, t
 
 = Bibliography
 
-#bibliography("data-report-refs.yml", title: none, style: "spie")
+#bibliography("report/refs.yml", title: none, style: "spie")

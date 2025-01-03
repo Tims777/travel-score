@@ -1,0 +1,9 @@
+public-domain:
+  short: PD
+  long: public domain
+  url: https://creativecommons.org/publicdomain/
+
+cc-by-4:
+  short: CC-BY 4.0
+  long: Creative Commons Attribution 4.0
+  url: https://creativecommons.org/licenses/by/4.0/

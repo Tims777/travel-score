@@ -10,9 +10,9 @@ therefore shifted towards creating such a dataset.
 ## Abstract
 
 Finding high-quality, tourism- and travel-related open datasets is a non-trivial
-task. While there are some high-quality datasets available [^unwto][^ttdi], they
+task. While there are some high-quality datasets available,[^unwto] [^ttdi], they
 cannot be used freely (e.g. not commercially) and are therefore not open data as
-defined by the Open Definition [^opendefinition].
+defined by the Open Definition.[^opendefinition]
 
 This project aims to create such an open dataset, by combining open data from
 different sources.

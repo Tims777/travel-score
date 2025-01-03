@@ -1,37 +1,80 @@
-# Methods of Advanced Data Engineering Template Project
+# Travel Score
 
-This template project provides some structure for your open data project in the MADE module at FAU.
-This repository contains (a) a data science project that is developed by the student over the course of the semester, and (b) the exercises that are submitted over the course of the semester.
+This repository contains code and reports for my
+[MADE](https://oss.cs.fau.de/teaching/specific/made/) project `travel-score`.
+While my original goal was to compare potential travel destinations in terms of
+their attractiveness, I quickly realized that this could be an easy task given
+the right dataset, which unfortunately does not exist. This projects goal has
+therefore shifted towards creating such a dataset.
 
-To get started, please follow these steps:
-1. Create your own fork of this repository. Feel free to rename the repository right after creation, before you let the teaching instructors know your repository URL. **Do not rename the repository during the semester**.
+## Abstract
 
-## Project Work
-Your data engineering project will run alongside lectures during the semester. We will ask you to regularly submit project work as milestones, so you can reasonably pace your work. All project work submissions **must** be placed in the `project` folder.
+Finding high-quality, tourism- and travel-related open datasets is a non-trivial
+task. While there are some high-quality datasets available [^unwto][^ttdi], they
+cannot be used freely (e.g. not commercially) and are therefore not open data as
+defined by the Open Definition [^opendefinition].
 
-### Exporting a Jupyter Notebook
-Jupyter Notebooks can be exported using `nbconvert` (`pip install nbconvert`). For example, to export the example notebook to HTML: `jupyter nbconvert --to html examples/final-report-example.ipynb --embed-images --output final-report.html`
+This project aims to create such an open dataset, by combining open data from
+different sources.
 
+[^unwto]: https://www.unwto.org/tourism-statistics/tourism-statistics-database
 
-## Exercises
-During the semester you will need to complete exercises using [Jayvee](https://github.com/jvalue/jayvee). You **must** place your submission in the `exercises` folder in your repository and name them according to their number from one to five: `exercise<number from 1-5>.jv`.
+[^ttdi]: https://www.weforum.org/publications/travel-tourism-development-index-2024/
 
-In regular intervals, exercises will be given as homework to complete during the semester. Details and deadlines will be discussed in the lecture, also see the [course schedule](https://made.uni1.de/).
+[^opendefinition]: https://opendefinition.org/
 
-### Exercise Feedback
-We provide automated exercise feedback using a GitHub action (that is defined in `.github/workflows/exercise-feedback.yml`). 
+## Datasources
 
-To view your exercise feedback, navigate to Actions → Exercise Feedback in your repository.
+### Datasource1: INFORM Risk
 
-The exercise feedback is executed whenever you make a change in files in the `exercise` folder and push your local changes to the repository on GitHub. To see the feedback, open the latest GitHub Action run, open the `exercise-feedback` job and `Exercise Feedback` step. You should see command line output that contains output like this:
+- URL: https://drmkc.jrc.ec.europa.eu/inform-index/INFORM-Risk
+- License: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 
-```sh
-Found exercises/exercise1.jv, executing model...
-Found output file airports.sqlite, grading...
-Grading Exercise 1
-	Overall points 17 of 17
-	---
-	By category:
-		Shape: 4 of 4
-		Types: 13 of 13
-```
+> The INFORM Risk Index is a global, open-source risk assessment for
+> humanitarian crises and disasters.
+
+I use the RISK score as an indicator for tourist safety.
+
+### Datasource2: International Comparison Program
+
+- URL: https://www.worldbank.org/en/programs/icp
+- License: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+
+> A worldwide statistical initiative to collect comparative price data and
+> detailed GDP expenditures to produce purchasing power parities (PPPs) for the
+> world’s economies
+
+I use the ICP data as an indicator for destination costliness.
+
+### Datasource3: OpenStreetMap
+
+- URL: https://planet.openstreetmap.org/
+- License: [ODbL](https://opendatacommons.org/licenses/odbl/1.0/)
+
+> OpenStreetMap is a free, editable map of the whole world that is being built
+> by volunteers largely from scratch and released with an open-content license.
+
+I extract data from OSM to serve as an indicator for resources that are relevant
+for tourists (natural, historic, touristic infrastructure).
+
+### Datasource4: Natural Earth
+
+- URL: https://www.naturalearthdata.com/
+- License: public domain
+
+> Natural Earth is a public domain map dataset available at 1:10m, 1:50m, and
+> 1:110 million scales.
+
+I am using Natural Earth as data source for country boundaries & administrative
+details.
+
+### Additional Datasource: Travel & Tourism Development Index
+
+- URL:
+  https://www.weforum.org/publications/travel-tourism-development-index-2024/
+- License: [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/)
+
+While the TTDI would be an excellent data source to build my project upon, this
+is unfortunately not possible as the data is licensed under terms that prohibit
+the publication of any derivatives. However, I might use this dataset to
+benchmark my own indicators against the TTDI ones.

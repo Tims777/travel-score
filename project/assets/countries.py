@@ -1,13 +1,11 @@
 from dagster import Config, asset
 from geopandas import read_file, GeoDataFrame
 
+from project.utils import AMERICAN_CONTINENTS, COUNTRY_CLASS, DEPENDENCY_CLASS, WESTERN_HEMISPHERE
+
 DOWNLOAD_URL = (
     "https://naciscdn.org/naturalearth/50m/cultural/ne_50m_admin_0_countries.zip"
 )
-AMERICAS = ["North America", "South America"]
-COUNTRY_CLASS = "Admin-0 country"
-DEPENDENCY_CLASS = "Admin-0 dependency"
-WESTERN_HEMISPHERE = (-180, -90, 0, 90)
 
 FIXES = {
     "VCT": {"fclass_iso": "Admin-0 country"},
@@ -31,7 +29,7 @@ def world(world_url: str) -> GeoDataFrame:
 
 
 class AmericasConfig(Config):
-    continents: list[str] = ["North America", "South America"]
+    continents: list[str] = AMERICAN_CONTINENTS
     include_dependencies: bool = False
 
 

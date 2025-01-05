@@ -3,14 +3,15 @@ from pandas import Index
 from pytest import mark
 from project.assets.countries import AmericasConfig, americas, world
 from project.tests.mocks import MOCKED_NATURAL_EARTH
-from project.utils import AMERICAN_COUNTRIES, N_COUNTRIES_WORLD, len_as_expected
+from project.utils import AMERICAN_COUNTRIES, COUNTRY_CLASS, N_COUNTRIES_WORLD, len_as_expected
 
 
 @mark.filterwarnings("ignore::DeprecationWarning")
 def test_world():
     gdf = world(MOCKED_NATURAL_EARTH)
     assert isinstance(gdf, GeoDataFrame)
-    assert len_as_expected(gdf, N_COUNTRIES_WORLD, 0.1)
+    countries = gdf[gdf["FCLASS_ISO"] == COUNTRY_CLASS]
+    assert len_as_expected(countries, N_COUNTRIES_WORLD, 0.1)
 
 
 @mark.filterwarnings("ignore::DeprecationWarning")

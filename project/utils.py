@@ -2,7 +2,11 @@ from typing import Sized
 
 CHUNK_SIZE = 1024 * 8
 YES = ("yes", "true", "1")
+WESTERN_HEMISPHERE = (-180, -90, 0, 90)
 N_COUNTRIES_WORLD = 195
+COUNTRY_CLASS = "Admin-0 country"
+DEPENDENCY_CLASS = "Admin-0 dependency"
+AMERICAN_CONTINENTS = ["North America", "South America"]
 AMERICAN_COUNTRIES = [
     "ARG",
     "ATG",

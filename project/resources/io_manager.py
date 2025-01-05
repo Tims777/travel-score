@@ -61,13 +61,13 @@ class LocalFileSystemIOManager(ConfigurableIOManager):
         table = self._get_table_name(context.asset_key)
         path = self._get_fs_path(context.asset_key)
         type = context.dagster_type.typing_type
-        query = f"SELECT * FROM {table}"
         if type == GeoDataFrame:
             infile = path.with_suffix(DB_SUFFIX)
-            return read_file(infile, sql=query, encoding=ENCODING)
+            return read_file(infile, encoding=ENCODING)
         elif type == DataFrame:
             infile = path.with_suffix(DB_SUFFIX)
             with connect(infile) as con:
+                query = f"SELECT * FROM {table}"
                 return read_sql(sql=query, con=con)
         elif type == str:
             infile = path.with_suffix(TXT_SUFFIX)

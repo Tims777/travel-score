@@ -2,6 +2,7 @@ from dagster import asset
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
+from numpy import arange, pi
 from pandas import DataFrame
 
 
@@ -21,6 +22,24 @@ def histograms(combined_dataset: DataFrame) -> Figure:
     axs = fig.subplots(ncols=cols, nrows=rows)
     for ax, col in zip(axs.reshape(-1), fields):
         combined_dataset.plot.hist(column=col, ax=ax)
+    return fig
+
+
+@asset(group_name="visuals")
+def radar_plot(travel_score: DataFrame) -> Figure:
+    n = 3
+    by = "total score"
+    categories = ["Safety", "Affordability", "Attractiveness"]
+    top_countries = travel_score.sort_values(by=by, ascending=False).head(n)
+    fig, ax = plt.subplots(subplot_kw={"projection": "polar"}, figsize=(4, 3))
+    theta = arange(len(categories)) * 2 * pi / len(categories)
+    for idx in top_countries.index:
+        country = top_countries.loc[idx]
+        r = country[map(str.lower, categories)]
+        ax.fill(theta, r, alpha=0.5, label=country["name"])
+    ax.set_xticks(theta, categories)
+    ax.set_title("Top Ranking Countries")
+    fig.legend(loc="lower right")
     return fig
 
 

@@ -1,0 +1,27 @@
+inform-risk:
+  name: Inform Risk Index
+  description: Risk profiles and indicators by country
+  license: cc-by-4
+  data-ref: inform-risk
+  license-ref: inform-risk-license
+
+icp:
+  name: International Comparison Program
+  description: Price levels compared between countries
+  license: cc-by-4
+  data-ref: icp
+  license-ref: icp-license
+
+osm:
+  name: OpenStreetMap
+  description: Map of tourism resources (natural, historic, etc.)
+  license: odbl
+  data-ref: osm
+  license-ref: osm-license
+
+natural-earth:
+  name: Natural Earth
+  description: Country boundaries & administrative details
+  license: public-domain
+  data-ref: natural-earth
+  license-ref: natural-earth-license

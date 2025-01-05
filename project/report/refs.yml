@@ -57,3 +57,43 @@ sqlite:
   type: web
   title: SQLite
   url: https://www.sqlite.org/
+
+unwto:
+  type: web
+  title: UN Tourism - Tourism Statistics Database
+  url: https://www.unwto.org/tourism-statistics/tourism-statistics-database
+
+ttdi:
+  type: web
+  title: Travel & Tourism Development Index 2024
+  url: https://www.weforum.org/publications/travel-tourism-development-index-2024/
+
+opendefinition:
+  type: web
+  title: The Open Definition
+  url: https://opendefinition.org/
+
+country-codes:
+  type: web
+  title: The World Factbook - Country Data Codes
+  url: https://www.cia.gov/the-world-factbook/references/country-data-codes/
+
+osm:
+  type: web
+  title: OpenStreetMap
+  url: https://www.openstreetmap.org/about
+
+osm-license:
+  type: web
+  title: OpenStreetMap - Copyright and License
+  url: https://www.openstreetmap.org/copyright
+
+osm-statistics:
+  type: web
+  title: OpenStreetMap - Database statistics
+  url: https://taginfo.openstreetmap.org/sources/db
+
+min-max-normalization:
+  type: web
+  title: Codecademy - Normalization
+  url: https://www.codecademy.com/article/normalization

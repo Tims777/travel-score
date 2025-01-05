@@ -7,3 +7,13 @@ cc-by-4:
   short: CC-BY 4.0
   long: Creative Commons Attribution 4.0
   url: https://creativecommons.org/licenses/by/4.0/
+
+cc-by-nc-nd-4:
+  short: CC BY-NC-ND 4.0
+  long: Creative Commons Attribution NonCommercial NoDerivatives 4.0
+  url: https://creativecommons.org/licenses/by-nc-nd/4.0/
+
+odbl:
+  short: ODbL
+  long: Open Data Commons Open Database License
+  url: https://opendatacommons.org/licenses/odbl/

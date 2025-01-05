@@ -1,6 +1,7 @@
 # flake8: noqa
 
 from . import (
+    benchmark,
     combined,
     countries, # type: ignore
     icp,
@@ -8,7 +9,6 @@ from . import (
     maps,
     osm,
     statistics,
-    ttdi,
 )
 
 __all__ = globals().keys()

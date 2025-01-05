@@ -21,30 +21,29 @@ def combined_dataset(
 def _normalize(df: DataFrame, col: str):
     min = 0
     max = df[col].mean() * 2
-    df[col] = (df[col] - min) / (max - min)
-    df[col].clip(upper=1.0, inplace=True)
+    df[col] = ((df[col] - min) / (max - min)).clip(upper=1.0)
 
 
 @asset(group_name="datasets")
 def travel_score(combined_dataset: GeoDataFrame) -> GeoDataFrame:
     # Prepare dataframes
-    df = combined_dataset
-    df.set_index("iso", inplace=True)
-    gdf = df[[df.active_geometry_name, "name", "continent"]]
+    cdf = combined_dataset
+    cdf.set_index("iso", inplace=True)
+    rdf = GeoDataFrame(cdf[[cdf.active_geometry_name, "name", "continent"]])
 
     # Calculate base indicators
-    gdf["safety"] = 1 / (df["hazard & exposure"] + df["lack of coping capacity"])
-    gdf["affordability"] = 1 / (df["actual individual consumption"])
-    gdf["attractiveness"] = (
-        df["natural score"] + df["historic score"] + df["tourism score"]
+    rdf["safety"] = 1 / (cdf["hazard & exposure"] + cdf["lack of coping capacity"])
+    rdf["affordability"] = 1 / (cdf["actual individual consumption"])
+    rdf["attractiveness"] = (
+        cdf["natural score"] + cdf["historic score"] + cdf["tourism score"]
     )
 
     # Normalize base indicators
     for col in ("safety", "affordability", "attractiveness"):
-        _normalize(gdf, col)
+        _normalize(rdf, col)
 
     # Calculate and normalize total score
-    gdf["total score"] = gdf["safety"] * gdf["affordability"] * gdf["attractiveness"]
-    _normalize(gdf, "total score")
+    rdf["total score"] = rdf["safety"] * rdf["affordability"] * rdf["attractiveness"]
+    _normalize(rdf, "total score")
 
-    return gdf
+    return rdf

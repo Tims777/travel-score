@@ -19,40 +19,10 @@ from project.utils import YES
 MISSING_VALUES_STYLE = {
     "color": "lightgrey",
     "edgecolor": "darkgrey",
-    "linewidth": 0.5,
+    "linewidth": 0,
     "hatch": "/////",
     "label": "Missing values",
 }
-
-
-def _plot(gdf: GeoDataFrame, column: str) -> Figure:
-    ax = gdf.plot.geo(
-        column=column,
-        missing_kwds=MISSING_VALUES_STYLE,
-        legend=True,
-    )
-    ax.set_axis_off()
-    return ax.get_figure()
-
-
-@asset(group_name="visuals")
-def affordability_map(travel_score: GeoDataFrame) -> Figure:
-    return _plot(travel_score, "affordability")
-
-
-@asset(group_name="visuals")
-def safety_map(travel_score: GeoDataFrame) -> Figure:
-    return _plot(travel_score, "safety")
-
-
-@asset(group_name="visuals")
-def attractiveness_map(travel_score: GeoDataFrame) -> Figure:
-    return _plot(travel_score, "attractiveness")
-
-
-@asset(group_name="visuals")
-def travel_score_map(travel_score: GeoDataFrame) -> Figure:
-    return _plot(travel_score, column="total score")
 
 
 @asset(group_name="visuals")
@@ -82,6 +52,31 @@ def combined_map(travel_score: GeoDataFrame) -> Figure:
 
 
 if environ.get("EXTRA_MAPS") in YES:
+
+    def _plot(gdf: GeoDataFrame, column: str) -> Figure:
+        ax = gdf.plot.geo(
+            column=column,
+            missing_kwds=MISSING_VALUES_STYLE,
+            legend=True,
+        )
+        ax.set_axis_off()
+        return ax.get_figure()
+
+    @asset(group_name="visuals")
+    def affordability_map(travel_score: GeoDataFrame) -> Figure:
+        return _plot(travel_score, "affordability")
+
+    @asset(group_name="visuals")
+    def safety_map(travel_score: GeoDataFrame) -> Figure:
+        return _plot(travel_score, "safety")
+
+    @asset(group_name="visuals")
+    def attractiveness_map(travel_score: GeoDataFrame) -> Figure:
+        return _plot(travel_score, "attractiveness")
+
+    @asset(group_name="visuals")
+    def travel_score_map(travel_score: GeoDataFrame) -> Figure:
+        return _plot(travel_score, column="total score")
 
     @asset(group_name="visuals")
     def map_of_america(americas: GeoDataFrame) -> Figure:

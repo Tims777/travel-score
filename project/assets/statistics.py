@@ -1,41 +1,8 @@
 from dagster import asset
-from geopandas import GeoDataFrame
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
-from numpy import array
 from pandas import DataFrame
-
-
-@asset(group_name="visuals")
-def benchmark(combined_dataset: GeoDataFrame, ttdi: DataFrame):
-    joined = combined_dataset.merge(ttdi, on="iso", how="left")
-
-    comparisons = [
-        ("Price Competitiveness pillar", "Actual Individual Consumption"),
-        ("Safety and Security pillar", "Hazard & Exposure"),
-        ("Health and Hygiene pillar", "Lack of Coping Capacity"),
-        ("Natural Resources pillar", "Natural score"),
-        ("Cultural Resources pillar", "Historic score"),
-        ("Tourist Services and Infrastructure pillar", "Tourism score"),
-    ]
-
-    nplots = array([3, 2])
-    fig = plt.figure(figsize=nplots * 4, frameon=False)
-    axs = fig.subplots(ncols=nplots[0], nrows=nplots[1])
-
-    for ax, (x_col, y_col) in zip(axs.reshape(-1), comparisons):
-        _scatter_plot(
-            ax=ax,
-            df=joined,
-            x_col=x_col,
-            y_col=y_col,
-            index_col="iso",
-        )
-
-    fig.tight_layout()
-
-    return fig
 
 
 @asset(group_name="visuals")
@@ -57,7 +24,7 @@ def histograms(combined_dataset: DataFrame) -> Figure:
     return fig
 
 
-def _scatter_plot(ax: Axes, df: DataFrame, x_col: str, y_col: str, index_col: str):
+def scatter_plot(ax: Axes, df: DataFrame, x_col: str, y_col: str, index_col: str):
     x = df[x_col.lower()]
     y = df[y_col.lower()]
     labels = df[index_col.lower()]

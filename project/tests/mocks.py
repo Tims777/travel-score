@@ -3,7 +3,7 @@ BASE_URL = (
     "Tims777",
     "c213bbfd354ae27628651937062b2acb",
     "raw",
-    "6e19c0325a9eb9b14e8c66c1834e8db2d1d5f714",
+    "8e7423a42305f4e142595511e90264b107a66196",
 )
 
 MOCKED_ICP_CYCLE = "/".join((*BASE_URL, "P_ICP-2021-Cycle.zip"))

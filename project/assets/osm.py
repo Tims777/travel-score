@@ -64,19 +64,14 @@ def _get_online_checksum(region: str, version: str) -> str:
         return checksum.decode()
 
 
-def _download_pbf(
-    region: str,
-    version: str,
-    outdir: str = ".",
-    replace: bool = False,
+def _download_file(
+    url: str,
+    outfile: Path,
+    resume: bool = True,
 ) -> Tuple[Path, int, bytes]:
-    filename = f"{region}-{version}.osm.pbf"
-    url = urljoin(SERVER, filename)
-    outfile = Path(outdir).joinpath(filename)
-
     with outfile.open("ab+") as fd:
-        # Continue download unless replace is True
-        start = 0 if replace else fd.tell()
+        # Continue download if resume is True
+        start = fd.tell() if resume else 0
         fd.truncate(start)
 
         # Calculate checksum of existing data
@@ -91,7 +86,7 @@ def _download_pbf(
             content_length = int(resp.headers.get("Content-Length"))
             accept_ranges = resp.headers.get("Accept-Ranges")
         if start == content_length:
-            return outfile, 0, checksum.digest().hex()
+            return 0, checksum.digest().hex()
 
         # GET
         req = Request(url, method="GET")
@@ -105,7 +100,7 @@ def _download_pbf(
 
         # Return amount of written bytes and checksum
         written = content_length - start
-        return outfile, written, checksum.digest().hex()
+        return written, checksum.digest().hex()
 
 
 type Coords = Tuple[int, int]
@@ -140,6 +135,11 @@ def _load_precomputed_analysis() -> GeoDataFrame:
             return read_file(fd, encoding=ENCODING)
 
 
+class PBFAnalysisConfig(Config):
+    skip_analysis: bool = environ.get("SKIP_PBF_ANALYSIS", "").lower() in YES
+    resolution: float = DEFAULT_RESOLUTION
+
+
 @multi_asset(
     specs=[
         AssetSpec(
@@ -153,37 +153,50 @@ def _load_precomputed_analysis() -> GeoDataFrame:
     group_name="pbfs",
 )
 def pbfs(
-    context: AssetExecutionContext, io_manager: ResourceParam[LocalFileSystemIOManager]
+    context: AssetExecutionContext,
+    io_manager: ResourceParam[LocalFileSystemIOManager],
+    config: PBFAnalysisConfig,
 ):
     for key in context.op_execution_context.selected_asset_keys:
+
         [asset_name] = key.parts
         metadata = context.assets_def.metadata_by_key[key]
         region = metadata["region"]
         version = metadata["version"]
-
         latest_materialization = context.instance.get_latest_materialization_event(key)
+
+        if config.skip_analysis:
+            context.log.info(f"{asset_name} ({version}): Skipping download")
+            if latest_materialization is None:
+                yield MaterializeResult(asset_key=key, metadata={"skipped": True})
+            continue
+
         local_checksum = _get_local_checksum(latest_materialization)
         online_checksum = _get_online_checksum(region, version)
+        tmpfile = Path(io_manager.data_dir).joinpath(f"{online_checksum}.downloading")
+        download_in_progress = tmpfile.exists()
 
-        if not local_checksum:
-            context.log.info(f"{asset_name} ({version}): Not previously materialized")
-            replace = False
-        elif online_checksum != local_checksum:
-            context.log.info(f"{asset_name} ({version}): Checksum mismatch")
-            replace = True
+        if online_checksum == local_checksum:
+            context.log.info(f"{asset_name} ({version}): Checksum okay.")
+            continue
+        elif download_in_progress:
+            context.log.info(f"{asset_name} ({version}): Resuming download ...")
+        elif local_checksum is None:
+            context.log.info(f"{asset_name} ({version}): Starting download ...")
         else:
-            context.log.info(f"{asset_name} ({version}): Checksum okay")
-            return
+            context.log.info(
+                f"{asset_name} ({version}): Checksum mismatch, redownloading ..."
+            )
 
-        outfile, written, new_checksum = _download_pbf(
-            region=region,
-            version=version,
-            outdir=io_manager.data_dir,
-            replace=replace,
-        )
+        filename = f"{region}-{version}.osm.pbf"
+        url = urljoin(SERVER, filename)
+        written, new_checksum = _download_file(url, tmpfile)
+        outfile = tmpfile.with_name(filename)
+        tmpfile.rename(outfile)
         context.log.info(f"Downloaded {written} bytes to {outfile}")
         context.log.info(f"Online checksum: {online_checksum}, local: {new_checksum}")
         assert online_checksum == new_checksum
+
         yield MaterializeResult(
             asset_key=key,
             metadata={
@@ -192,11 +205,6 @@ def pbfs(
                 "size (bytes)": MetadataValue.int(outfile.stat().st_size),
             },
         )
-
-
-class PBFAnalysisConfig(Config):
-    skip_analysis: bool = environ.get("SKIP_PBF_ANALYSIS", "").lower() in YES
-    resolution: float = DEFAULT_RESOLUTION
 
 
 @asset(group_name="datasets", deps=PBF_ASSETS.keys())
@@ -226,7 +234,7 @@ def pbf_analysis(
     for coords, features in bins.items():
         geometry = {"geometry": Polygon(_square(coords, config.resolution))}
         dps.append(geometry | features)
-    return GeoDataFrame(dps)
+    return GeoDataFrame(dps, crs="EPSG:4326")
 
 
 @asset(group_name="datasets")

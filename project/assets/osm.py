@@ -28,7 +28,7 @@ from osmium.osm import NODE
 from pandas import DataFrame, NamedAgg
 from shapely import Polygon
 
-from project.assets.utils import CHUNK_SIZE, YES
+from project.utils import CHUNK_SIZE, YES
 from project.resources.io_manager import ENCODING, LocalFileSystemIOManager
 from project.tests.mocks import PRECOMPUTED_PBF_ANALYSIS
 

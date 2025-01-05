@@ -2,6 +2,7 @@ from dagster import asset
 from geopandas import GeoDataFrame
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 from numpy import array
 from pandas import DataFrame
 
@@ -34,6 +35,25 @@ def benchmark(combined_dataset: GeoDataFrame, ttdi: DataFrame):
 
     fig.tight_layout()
 
+    return fig
+
+
+@asset(group_name="visuals")
+def histograms(combined_dataset: DataFrame) -> Figure:
+    fields = [
+        "hazard & exposure",
+        "lack of coping capacity",
+        "actual individual consumption",
+        "natural score",
+        "historic score",
+        "tourism score",
+    ]
+    rows = 2
+    cols = len(fields) // rows
+    fig = plt.figure(figsize=(cols * 4, rows * 3), layout="tight")
+    axs = fig.subplots(ncols=cols, nrows=rows)
+    for ax, col in zip(axs.reshape(-1), fields):
+        combined_dataset.plot.hist(column=col, ax=ax)
     return fig
 
 

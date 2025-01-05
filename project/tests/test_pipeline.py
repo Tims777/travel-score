@@ -11,7 +11,7 @@ from pytest import mark
 
 import project
 from project.tests.mocks import MOCK_ASSETS
-from project.utils import N_COUNTRIES_AMERICAS, len_as_expected
+from project.utils import AMERICAN_COUNTRIES, len_as_expected
 
 
 RESULT_DATASET = "combined_dataset"
@@ -59,7 +59,7 @@ def _check_output(datadir):
     with connect(outfile) as con:
         query = f"SELECT * FROM {RESULT_DATASET}"
         df = read_sql(sql=query, con=con)
-    assert len_as_expected(df, N_COUNTRIES_AMERICAS, 0.25)
+    assert len_as_expected(df, len(AMERICAN_COUNTRIES), 0.0)
     assert "total consumption" in df
     assert "inform risk index" in df
     assert "tourism score" in df

@@ -75,7 +75,7 @@ Several resource scores have been derived from the OpenStreetMap dataset (see @r
 
 Of all 35 records, 30 are complete, while the remaining 5 are lacking price levels.
 Depending on the respective data source, the numerical values have different domains.
-While risk indicators are constrained to the range 0 to 10, with 10 being the riskiest, price data is measured on a relative scale, with 100 being the global per-category average. Resource scores are measured on a relative scale between 0 and 1.
+While risk indicators are constrained to the range 0 to 10, with 10 being the riskiest, price data is measured on a relative scale, with 100 being the global per-category average. Resource scores are measured on a similar scale but with 1 being the per-category average.
 
 == License
 
@@ -132,15 +132,15 @@ The results, which have been visualized in @results-map, will now be discussed i
 Please note that this context is only intended to give a quick overview and not to imply any causal relationships between geographic locations and scores.
 
 #figure(
-  image("../data/combined_map.svg"),
+  image("../data/combined_map.svg", width: 100%),
   caption: "Visualizations of base factors and resulting travel score on a map of the Americas.",
   placement: auto,
 ) <results-map>
 
-Safety tends to be higher further away from the equator, with the safest mainland countries being Uruguay in southern South America and Canada in northern North America. Islands on the other hand are generally safer than most mainland countries, with Haiti and the Dominican Republic being the only exception.
+Safety tends to be higher further away from the equator, with the safest mainland countries being Uruguay in the south and Canada in the north. Islands on the other hand are generally safer than most mainland countries, with Haiti and the Dominican Republic being the only exception.
 
-South America is clearly the more affordable of both continents, considering that Canada and the USA are by far the most expensive countries with Uruguay, the most expensive South American country, scoring only 5th place.
-Attractiveness on the other hand tends to be a bit higher in North America, with the USA scoring first place, clearly before Argentina in the 2nd place and followed by Mexico and Canada which are both part of North America again.
+South America is clearly the more affordable continent, considering that Canada and the USA are by far the most expensive countries, although some North American countries make it into top ten (Nicaragua, Dominican Republic and Guatemala).
+Attractiveness on the other hand tends to be a bit higher in North America, with the USA scoring first place, clearly before Argentina in the 2nd place and followed by more North American countries (Mexico and Canada).
 
 #figure(
   image("../data/radar_plot.svg", width: 50%),
@@ -148,10 +148,16 @@ Attractiveness on the other hand tends to be a bit higher in North America, with
   placement: auto,
 ) <radar-plot>
 
-So far this is not too far off from what might be expected based on intuition or common knowledge.
-However, the interesting part begins once that all factors get combined to form the resulting travel score.
-Here Argentina emerges as the clear winner, followed by its neighbors Paraguay, Bolivia and Chile.
-This is especially interesting, because neither of these countries score highest in any of the three sub-categories, they simply do not score exceptionally low anywhere (see @radar-plot).
+So far this is not too far off from what might be expected based on common knowledge.
+However, the interesting part begins, once that all factors get combined to form the resulting travel score.
+Now Argentina emerges as the clear winner, directly followed by its neighbors Paraguay, Bolivia and Chile.
+
+== Interpretation
+
+These results are especially interesting, because none of the three top countries score highest in any of the sub-categories, they simply do not score exceptionally low anywhere.
+This means that no factor managed to outweigh the others, which speaks for the efficacy of the employed methodology.
+
+Additionally, among the three top countries, each one is best in its own sub-category (see @radar-plot). This suggests, that in general there will always be the need for tradeoffs between different priorities, as no travel destination can be best in all aspects.
 
 = Conclusions
 
@@ -167,14 +173,19 @@ Likewise, it was not possible to account for all potential push and pull factors
 == Limitations in used data
 
 Besides of the methodology, the underlying data might be inaccurate as well.
-As such, the data might be biased, especially in the context of OpenStreetMap, where volunteers contribute to a common data basis.
-This can lead to biases towards regions where many contributors live.
+As such, the data could be biased, especially in the context of OpenStreetMap. Here, volunteers contribute to a common data basis, which can lead to biases towards regions where many contributors live or visit.
 
 Additionally, perfectly valid data in its original form could be misleading in a different context.
 The Inform Risk Index for example is constructed from the viewpoint of organizations, seeking an insight into the risk of humanitarian crises and disasters.
 This is obviously not the same as the risk for individual tourists, traveling through a foreign country.
 
 Lastly, the aggregation of data at country level can be problematic. For example, the natural resource maximum might be far away from the historic resource maximum or the city at the touristic resource maximum is actually far more expensive, than the countries average costliness might suggest.
+
+== Outlook
+
+Given these limitations, it becomes apparent that work on the methodology and the addition of data sources both have potential to increase the quality and credibility of the resulting dataset. A very promising approach would be the incorporation of risk and price data on a scale below country level. However, such datasets are usually less recent or do not exist yet at all.
+
+Looking in the other direction, it would also be interesting to expand the existing analysis scope to global level, including other continents as well. While this would theoretically be possible using the present data sources, doing so might introduce new challenges and will consequently require additional tuning and verification work.
 
 #pagebreak()
 

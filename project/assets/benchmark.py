@@ -1,7 +1,7 @@
 from ast import literal_eval
 from os import environ
 from dagster import asset
-from matplotlib import figure
+from matplotlib import pyplot as plt
 from numpy import array
 from pandas import DataFrame, MultiIndex, read_excel
 from geopandas import GeoDataFrame
@@ -48,10 +48,10 @@ if environ.get("BENCHMARK") in YES:
         ]
 
         nplots = array([3, 2])
-        fig = figure(figsize=nplots * 4, frameon=False)
+        fig = plt.figure(figsize=nplots * 4, frameon=False)
         axs = fig.subplots(ncols=nplots[0], nrows=nplots[1])
 
-        for ax, (x_col, y_col) in zip(axs.reshape(-1), comparisons):
+        for ax, (x_col, y_col) in zip(axs.ravel(), comparisons):
             scatter_plot(
                 ax=ax,
                 df=joined,

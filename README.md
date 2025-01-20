@@ -21,6 +21,15 @@ such an open dataset, by combining open data from different sources.
 
 [^opendefinition]: https://opendefinition.org/
 
+## Reports
+
+Please refer to the following documents for more details about this project.
+
+- [Data Report](./project/data-report.pdf)
+- [Analysis Report](./project/analysis-report.pdf)
+- [Benchmark Results](./project/benchmark-results.pdf)
+- [Presentation Slides](./project/slides.pdf)
+
 ## Datasources
 
 ### Datasource1: INFORM Risk
@@ -52,8 +61,8 @@ I use the ICP data as an indicator for destination costliness.
 > OpenStreetMap is a free, editable map of the whole world that is being built
 > by volunteers largely from scratch and released with an open-content license.
 
-I extract data from OSM to serve as an indicator for resources that are relevant
-for tourists (natural, historic, touristic infrastructure).
+I extract data from OSM to serve as an indicator for resources (e.g. natural or
+historic) that are relevant for tourists.
 
 ### Datasource4: Natural Earth
 
@@ -72,7 +81,45 @@ details.
   https://www.weforum.org/publications/travel-tourism-development-index-2024/
 - License: [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/)
 
-While the TTDI would be an excellent data source to build my project upon, this
-is unfortunately not possible as the data is licensed under terms that prohibit
-the publication of any derivatives. However, I might use this dataset to
-benchmark my own indicators against the TTDI ones.
+> The TTDI measures the set of factors and policies that enable the sustainable
+> and resilient development of T&T.
+
+While the TTDI would have been an excellent data source to build my project
+upon, this was not possible, as the data is licensed under terms that prohibit
+the publication of derivatives. However, to get an impression of how accurate my
+own dataset is, I use the TTDI data for benchmarking purposes.
+
+After comparing both datasets, I realized that it might be interesting for
+others to see the results as well. Therefore, I contacted the World Economic
+Forum, publishers of the TTDI, and asked for approval to publish my results. The
+following is an extract from the relevant correspondence, slightly simplified
+but with the wording unchanged.
+
+> **Usage of TTDI data as benchmark for open data project**
+>
+> I am currently working on a university project about tourism in the Americas,
+> for which I collected data from several open data sources. Because the
+> resulting dataset is similar in nature, I used your TTDI dataset to benchmark
+> my own data. However, due to the nature of the CC BY-NC-ND license, I cannot
+> publish my analysis results although I would like to do so.
+>
+> Therefore, I would like to ask your written approval of publishing my analysis
+> (as part of my Git repository at https://github.com/Tims777/travel-score), if
+> you feel that this is in line with your goals and vision. To give you an
+> impression of what my analysis results look like, I attached the current
+> version as SVG.
+>
+> My project is of academic nature and as such, my use of the TTDI is
+> non-commercial.
+
+> **Re: Usage of TTDI data as benchmark for open data project**
+>
+> The Forum can exceptionally authorize the described use of the material,
+> provided that (i) the remaining conditions of the
+> [Creative Commons
+Attribution-NonCommercial-NoDerivatives 4.0 International](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en)
+> Public Licence must be respected; and (ii) you shall not use the Forum’s
+> materials beyond the described scope or in any manner that may be harmful for
+> the World Economic Forum.
+>
+> The authorization herein is revocable at the will of the World Economic Forum.

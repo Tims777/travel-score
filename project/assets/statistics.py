@@ -51,16 +51,16 @@ def scatter_plot(ax: Axes, df: DataFrame, x_col: str, y_col: str, index_col: str
     corr = x.corr(y)
     txt = f"Correlation: {corr:.3f}"
     ax.text(
-        x=0.95,
-        horizontalalignment="right",
+        x=0.5,
+        ha="center",
         y=0.95,
-        verticalalignment="top",
+        va="top",
         s=txt,
         transform=ax.transAxes,
     )
     ax.set_xlabel(x_col)
     ax.set_ylabel(y_col)
-    ax.scatter(x, y, label=labels)
+    ax.scatter(x, y)
 
     for i, txt in enumerate(labels):
-        ax.annotate(txt, (x[i], y[i]))
+        ax.annotate(xy=(x[i], y[i]), text=txt, ha="center", va="bottom")

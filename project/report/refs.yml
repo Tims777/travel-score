@@ -97,3 +97,13 @@ min-max-normalization:
   type: web
   title: Codecademy - Normalization
   url: https://www.codecademy.com/article/normalization
+
+travel-score-git:
+  type: web
+  title: Travel Score - GitHub
+  url: https://github.com/tims777/travel-score/
+
+travel-score-analysis:
+  type: web
+  title: Travel Score - Analysis Report
+  url: https://raw.githubusercontent.com/tims777/travel-score/main/project/analysis-report.pdf

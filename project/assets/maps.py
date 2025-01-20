@@ -53,14 +53,17 @@ def combined_map(travel_score: GeoDataFrame) -> Figure:
 
 if environ.get("EXTRA_MAPS") in YES:
 
-    def _plot(gdf: GeoDataFrame, column: str) -> Figure:
+    def _plot(gdf: GeoDataFrame, column: str, **kwargs) -> Figure:
         ax = gdf.plot.geo(
             column=column,
             missing_kwds=MISSING_VALUES_STYLE,
             legend=True,
+            **kwargs,
         )
         ax.set_axis_off()
-        return ax.get_figure()
+        fig = ax.get_figure()
+        fig.tight_layout()
+        return fig
 
     @asset(group_name="visuals")
     def affordability_map(travel_score: GeoDataFrame) -> Figure:
@@ -76,11 +79,11 @@ if environ.get("EXTRA_MAPS") in YES:
 
     @asset(group_name="visuals")
     def travel_score_map(travel_score: GeoDataFrame) -> Figure:
-        return _plot(travel_score, column="total score")
+        return _plot(travel_score, "total score")
 
     @asset(group_name="visuals")
     def map_of_america(americas: GeoDataFrame) -> Figure:
-        return _plot(americas, "continent")
+        return _plot(americas, "continent", legend_kwds={"loc": "lower left"})
 
     @multi_asset(
         outs={

@@ -132,7 +132,7 @@ The results, which have been visualized in @results-map, will now be discussed i
 Please note that this context is only intended to give a quick overview and not to imply any causal relationships between geographic locations and scores.
 
 #figure(
-  image("../data/combined_map.svg", width: 100%),
+  image("report/media/combined_map.svg", width: 100%),
   caption: "Visualizations of base factors and resulting travel score on a map of the Americas.",
   placement: auto,
 ) <results-map>
@@ -143,7 +143,7 @@ South America is clearly the more affordable continent, considering that Canada 
 Attractiveness on the other hand tends to be a bit higher in North America, with the USA scoring first place, clearly before Argentina in the 2nd place and followed by more North American countries (Mexico and Canada).
 
 #figure(
-  image("../data/radar_plot.svg", width: 50%),
+  image("report/media/radar_plot.svg", width: 50%),
   caption: "Visualizations of base factors for the three top ranking countries.",
   placement: auto,
 ) <radar-plot>

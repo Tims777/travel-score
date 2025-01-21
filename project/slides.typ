@@ -1,4 +1,5 @@
 #import "@preview/diatypst:0.4.0": *
+#import "@preview/mannot:0.2.0": *
 
 #set text(font: "DejaVu Sans Mono")
 
@@ -36,7 +37,7 @@
 
       - Where can go as a tourist?
         - Is it safe?
-        - Can you afford it?
+        - How affordable is it?
         - What is there to do?
     ],
     [#image("report/media/map_of_america.svg", height: 100% - 1em)],
@@ -119,17 +120,27 @@
 }
 
 == Travel Score Calculation
-#align(horizon + center)[
+#align(horizon)[
 
   #text(size: 1.5em)[
-    #math.equation($"total score" = norm("safety" dot "affordability" dot "attractiveness")$) <travel-score>
+    #math.equation($
+      "travel score" =
+      mark("safety", tag: #<safety>, color: #green) dot
+      mark("affordability", tag: #<affordability>, color: #main-color) dot
+      mark("attractiveness", tag: #<attractiveness>, color: #blue)
+    $) <travel-score>
   ]
 
-  // #math.equation($"safety" = norm(frac(1, "hazard & exposure" + "lack of coping capacity"))$) <safety-factor>
+  #annot(<safety>, pos: bottom + left, yshift: 1em, text-props: (size: 12pt))[risk factors]
 
-  // #math.equation($"affordability" = norm(frac(1, "actual individual consumption"))$) <affordability-factor>
+  #annot(<affordability>, pos: bottom + left, yshift: 4em, text-props: (size: 12pt))[price level of consumption]
 
-  // #math.equation($"attractiveness" = norm("natural score" + "historic score" + "tourism score")$) <attractiveness-factor>
+  #annot(
+    <attractiveness>,
+    pos: bottom + left,
+    yshift: 7em,
+    text-props: (size: 12pt),
+  )[natural, historic & touristic resources]
 
 ]
 
@@ -158,20 +169,20 @@
   ]
 }
 
-= Outlook
-
-== Current Limitations
+== Limitations
 
 #align(horizon)[
   === Methodology
   - Objective ranking does not consider personal preferences
   - Limited amount of push- & pull-factors could be included
+  - Aggregation at country level is not ideal
 
   === Data
   - Lower accuracy due to biases?
   - Data misaligned with tourist perspective?
-  - Aggregation at country level is not ideal
 ]
+
+= Outlook
 
 == Further Ideas
 

@@ -21,7 +21,14 @@ such an open dataset, by combining open data from different sources.
 
 [^opendefinition]: https://opendefinition.org/
 
-## Reports
+## Results
+
+![Choropleth maps of North and South America, depicting the ](./project/report/media/combined_map.svg)
+
+The above map is a visualization of the calculated travel scores for North and South America.
+You can find the full dataset in the [release section](https://github.com/Tims777/travel-score/releases).
+
+## Detailed Reports
 
 Please refer to the following documents for more details about this project.
 

@@ -1,7 +1,13 @@
 from dagster import Config, asset
 from geopandas import read_file, GeoDataFrame
 
-from project.utils import AMERICAN_CONTINENTS, COUNTRY_CLASS, DEPENDENCY_CLASS, WESTERN_HEMISPHERE
+from project.utils import (
+    AMERICAN_CONTINENTS,
+    COUNTRY_CLASS,
+    DEPENDENCY_CLASS,
+    WESTERN_HEMISPHERE,
+    dataset,
+)
 
 DOWNLOAD_URL = (
     "https://naciscdn.org/naturalearth/50m/cultural/ne_50m_admin_0_countries.zip"
@@ -9,6 +15,12 @@ DOWNLOAD_URL = (
 
 FIXES = {
     "VCT": {"fclass_iso": "Admin-0 country"},
+}
+
+NATURAL_EARTH = {
+    "name": "Natural Earth",
+    "url": "https://www.naturalearthdata.com/",
+    "license": "Public Domain",
 }
 
 
@@ -23,7 +35,7 @@ def world_url():
     return DOWNLOAD_URL
 
 
-@asset(group_name="datasets")
+@dataset(sources=[NATURAL_EARTH])
 def world(world_url: str) -> GeoDataFrame:
     return read_file(world_url)
 
@@ -33,7 +45,7 @@ class AmericasConfig(Config):
     include_dependencies: bool = False
 
 
-@asset(group_name="datasets")
+@dataset(sources=[NATURAL_EARTH])
 def americas(config: AmericasConfig, world: GeoDataFrame) -> GeoDataFrame:
     _fix(world)
     classes = [COUNTRY_CLASS]

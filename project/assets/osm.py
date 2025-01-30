@@ -18,7 +18,6 @@ from dagster import (
     MaterializeResult,
     MetadataValue,
     ResourceParam,
-    asset,
     multi_asset,
 )
 from numpy import mean
@@ -28,7 +27,8 @@ from osmium.osm import NODE
 from pandas import DataFrame, NamedAgg
 from shapely import Polygon
 
-from project.utils import CHUNK_SIZE, YES
+from project.assets.countries import NATURAL_EARTH
+from project.utils import CHUNK_SIZE, YES, dataset
 from project.resources.io_manager import ENCODING, LocalFileSystemIOManager
 from project.tests.mocks import PRECOMPUTED_PBF_ANALYSIS
 
@@ -45,6 +45,13 @@ PBF_ASSETS = {"_".join(["pbf"] + region.split("-")): region for region in REGION
 
 OSM_KEYS = "amenity", "historic", "leisure", "natural", "shop", "tourism"
 DEFAULT_RESOLUTION = 2
+
+OSM = {
+    "name": "OpenStreetMap",
+    "url": "https://planet.openstreetmap.org/",
+    "license": "Open Data Commons Open Database License 1.0",
+    "license_url": "https://opendatacommons.org/licenses/odbl/1.0/",
+}
 
 
 def _get_local_checksum(latest_materialization: EventLogEntry | None) -> str | None:
@@ -207,7 +214,7 @@ def pbfs(
         )
 
 
-@asset(group_name="datasets", deps=PBF_ASSETS.keys())
+@dataset(sources=[OSM], deps=PBF_ASSETS.keys())
 def pbf_analysis(
     context: AssetExecutionContext, config: PBFAnalysisConfig
 ) -> GeoDataFrame:
@@ -237,7 +244,7 @@ def pbf_analysis(
     return GeoDataFrame(dps, crs="EPSG:4326")
 
 
-@asset(group_name="datasets")
+@dataset(sources=[OSM, NATURAL_EARTH])
 def resources_score(pbf_analysis: GeoDataFrame, world: GeoDataFrame) -> DataFrame:
     # Prepare pbf_analysis dataset
     non_geo = pbf_analysis.columns.difference([pbf_analysis.active_geometry_name])

@@ -7,10 +7,17 @@ from pandas import DataFrame, MultiIndex, read_excel
 from geopandas import GeoDataFrame
 
 from project.assets.statistics import scatter_plot
-from project.utils import YES
+from project.utils import YES, dataset
 
 
 if environ.get("BENCHMARK") in YES:
+
+    TTDI = {
+        "name": "Travel & Tourism Development Index",
+        "url": "https://www.weforum.org/publications/travel-tourism-development-index-2024/",
+        "license": "Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International ",
+        "license_url": "https://creativecommons.org/licenses/by-nc-nd/4.0/",
+    }
 
     DOWNLOAD_URL = "https://www3.weforum.org/docs/WEF_TTDI_2024_edition_data.xlsx"
 
@@ -18,12 +25,12 @@ if environ.get("BENCHMARK") in YES:
     def ttdi_url() -> str:
         return DOWNLOAD_URL
 
-    @asset(group_name="datasets")
+    @dataset(sources=[TTDI])
     def ttdi_raw(ttdi_url: str) -> DataFrame:
         df = read_excel(ttdi_url, header=[0, 1], index_col=0)
         return df
 
-    @asset(group_name="datasets")
+    @dataset(sources=[TTDI])
     def ttdi(ttdi_raw: DataFrame) -> DataFrame:
         df = ttdi_raw
         df.set_index(df.columns[0], inplace=True)

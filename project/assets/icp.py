@@ -6,6 +6,8 @@ from dagster import AssetExecutionContext, asset
 from pandas import DataFrame, IndexSlice, read_csv, to_numeric
 from urllib.request import Request, urlopen
 
+from project.utils import dataset
+
 PREPARE_URL = "https://databank.worldbank.org/AjaxDownload/FileInfoHandler.ashx"
 DOWNLOAD_URL = "https://databank.worldbank.org/AjaxDownload/FileDownloadHandler.ashx"
 PREPARE_ARGS = {
@@ -19,6 +21,13 @@ PREPARE_ARGS = {
 
 INDEX_COLS = ["Classification Code", "Time Code", "Country Code"]
 NAME_COLS = ["Classification Name", "Time", "Country Name"]
+
+ICP = {
+    "name": "International Comparison Program",
+    "url": "https://www.worldbank.org/en/programs/icp",
+    "license": "Creative Commons Attribution 4.0 International",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+}
 
 
 def extract_csv_from_zip(zip: ZipFile, pattern: str):
@@ -39,7 +48,7 @@ def icp_metrics_url() -> str:
     return DOWNLOAD_URL + "?" + download_args.decode()
 
 
-@asset(group_name="datasets")
+@dataset(sources=[ICP])
 def icp_metrics(icp_metrics_url: str) -> DataFrame:
 
     # Download and extract data
@@ -65,7 +74,7 @@ def icp_metrics(icp_metrics_url: str) -> DataFrame:
     return df
 
 
-@asset(group_name="datasets")
+@dataset(sources=[ICP])
 def price_level(context: AssetExecutionContext, icp_metrics: DataFrame) -> DataFrame:
 
     # Restore index

@@ -1,9 +1,14 @@
-from dagster import asset
 from pandas import DataFrame
 from geopandas import GeoDataFrame
 
+from project.assets.countries import NATURAL_EARTH
+from project.assets.icp import ICP
+from project.assets.inform import INFORM
+from project.assets.osm import OSM
+from project.utils import dataset
 
-@asset(group_name="datasets")
+
+@dataset(sources=[NATURAL_EARTH, INFORM, ICP, OSM])
 def combined_dataset(
     americas: GeoDataFrame,
     inform_scores: DataFrame,
@@ -24,7 +29,7 @@ def _normalize(df: DataFrame, col: str):
     df[col] = ((df[col] - min) / (max - min)).clip(upper=1.0)
 
 
-@asset(group_name="datasets")
+@dataset(sources=[NATURAL_EARTH, INFORM, ICP, OSM])
 def travel_score(combined_dataset: GeoDataFrame) -> GeoDataFrame:
     # Prepare dataframes
     cdf = combined_dataset

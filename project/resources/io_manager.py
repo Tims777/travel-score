@@ -1,7 +1,13 @@
 from pathlib import Path
 from sqlite3 import connect
-from typing import TypeAlias
-from dagster import AssetKey, ConfigurableIOManager, MetadataValue
+from typing import List, Mapping, TypeAlias
+from dagster import (
+    AssetKey,
+    ConfigurableIOManager,
+    InputContext,
+    MetadataValue,
+    OutputContext,
+)
 from matplotlib.figure import Figure
 from pandas import DataFrame, read_sql
 from geopandas import GeoDataFrame, read_file
@@ -11,6 +17,12 @@ DB_SUFFIX = ".sqlite"
 DB_DRIVER = "SQLite"
 FIG_SUFFIX = ".svg"
 TXT_SUFFIX = ".txt"
+LICENSE_SUFFIX = ".license"
+
+LICENSE_FILE_HEADER = (
+    "# License Information\n\n"
+    "The dataset '{0}' contains data from the following sources.\n"
+)
 
 AssetType: TypeAlias = None | DataFrame | GeoDataFrame | Figure | str
 
@@ -26,7 +38,7 @@ class LocalFileSystemIOManager(ConfigurableIOManager):
     def _get_table_name(self, asset_key: AssetKey) -> str:
         return "_".join(asset_key.path)
 
-    def handle_output(self, context, obj: AssetType):
+    def handle_output(self, context: OutputContext, obj: AssetType):
         table = self._get_table_name(context.asset_key)
         path = self._get_fs_path(context.asset_key)
         meta = {}
@@ -57,7 +69,22 @@ class LocalFileSystemIOManager(ConfigurableIOManager):
             raise NotImplementedError(f"Cannot handle {type}")
         context.add_output_metadata(meta)
 
-    def load_input(self, context) -> AssetType:
+        if "sources" in context.definition_metadata:
+            self.write_license_file(outfile, context.definition_metadata["sources"])
+
+    def write_license_file(self, basefile: Path, sources: List[Mapping[str, str]]):
+        licensefile = basefile.with_suffix(basefile.suffix + LICENSE_SUFFIX)
+        with licensefile.open("w") as fd:
+            fd.write(LICENSE_FILE_HEADER.format(basefile.name))
+            for source in sources:
+                fd.write("\n")
+                fd.write(f"## {source.get("name", "DataSource")}\n")
+                for key, val in source.items():
+                    if key == "name":
+                        continue
+                    fd.write(f"{key.upper()}: {val}\n")
+
+    def load_input(self, context: InputContext) -> AssetType:
         table = self._get_table_name(context.asset_key)
         path = self._get_fs_path(context.asset_key)
         type = context.dagster_type.typing_type

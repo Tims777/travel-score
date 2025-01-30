@@ -3,7 +3,7 @@
 from . import (
     benchmark,
     combined,
-    countries, # type: ignore
+    countries,
     icp,
     inform,
     maps,

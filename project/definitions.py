@@ -7,7 +7,7 @@ from .resources.io_manager import LocalFileSystemIOManager
 
 DEFAULT_DATA_DIR = Path(__file__).parents[1].joinpath("data")
 
-asset_modules = (getattr(assets, name) for name in dir(assets))
+asset_modules = (getattr(assets, name) for name in dir(assets) if "__" not in name)
 data_dir = environ.get("DAGSTER_HOME", DEFAULT_DATA_DIR)
 
 defs = Definitions(

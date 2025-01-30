@@ -1,6 +1,6 @@
-dagster
-pandas
-geopandas
-matplotlib
-osmium
-openpyxl
+dagster==1.9.11
+pandas==2.2.3
+geopandas==1.0.1
+matplotlib==3.10.0
+osmium==4.0.2
+openpyxl==3.1.5
